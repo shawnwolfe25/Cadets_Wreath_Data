@@ -15,13 +15,10 @@ async function redisGet(key) {
 }
 
 async function redisSet(key, value) {
-  await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${REDIS_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ value: JSON.stringify(value) })
+  const encoded = encodeURIComponent(JSON.stringify(value));
+  await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}/${encoded}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
   });
 }
 
@@ -93,6 +90,7 @@ module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Content-Type", "application/json");
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
