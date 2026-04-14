@@ -12,18 +12,32 @@ async function redisGet(key) {
   });
   const j = await r.json();
   if (!j.result) return [];
-  // Upstash sometimes double-stringifies — unwrap until we have an array
+
+  // Upstash returns the outer array wrapper — unwrap everything until we have
+  // a plain array of cadet objects
   let val = j.result;
   let attempts = 0;
-  while (typeof val === "string" && attempts < 3) {
-    try { val = JSON.parse(val); } catch { break; }
+  while (attempts < 5) {
+    if (Array.isArray(val)) {
+      // If first element is a string, it's a wrapped JSON string — parse it
+      if (val.length > 0 && typeof val[0] === "string") {
+        try { val = JSON.parse(val[0]); } catch { break; }
+      } else {
+        // It's a proper array of objects — we're done
+        break;
+      }
+    } else if (typeof val === "string") {
+      try { val = JSON.parse(val); } catch { break; }
+    } else {
+      break;
+    }
     attempts++;
   }
   return Array.isArray(val) ? val : [];
 }
 
 async function redisSet(key, value) {
-  // Upstash REST: POST /set/key with body ["value"] (array with one string element)
+  // Store as a plain JSON string — no wrapping in an array
   const r = await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}`, {
     method: "POST",
     headers: {
