@@ -8,10 +8,19 @@ async function redisGet(key) {
     headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
   });
   const j = await r.json();
-  return j.result ? JSON.parse(j.result) : null;
+  if (!j.result) return [];
+  // Upstash sometimes double-stringifies — unwrap until we have an array
+  let val = j.result;
+  let attempts = 0;
+  while (typeof val === "string" && attempts < 3) {
+    try { val = JSON.parse(val); } catch { break; }
+    attempts++;
+  }
+  return Array.isArray(val) ? val : [];
 }
 
 async function redisSet(key, value) {
+  // Upstash REST: POST /set/key with body ["value"] (array with one string element)
   const r = await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}`, {
     method: "POST",
     headers: {
