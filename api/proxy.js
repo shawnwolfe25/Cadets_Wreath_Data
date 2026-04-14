@@ -1,3 +1,6 @@
+// api/proxy.js — Vercel Serverless Function
+// Fix: use module.exports (not export default) for non-Next.js Vercel projects
+
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const CADETS_KEY = "waa:cadets";
@@ -159,6 +162,19 @@ module.exports = async function handler(req, res) {
       cadets = cadets.filter(c => c.id !== id);
       await redisSet(CADETS_KEY, cadets);
       return res.status(200).json({ ok: true });
+    }
+
+    // GET ?action=debug — shows raw Redis response for troubleshooting
+    if (req.method === "GET" && action === "debug") {
+      const r = await fetch(`${REDIS_URL}/get/${encodeURIComponent(CADETS_KEY)}`, {
+        headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
+      });
+      const raw = await r.json();
+      return res.status(200).json({
+        raw,
+        resultType: typeof raw.result,
+        resultValue: raw.result
+      });
     }
 
     return res.status(404).json({ error: `Unknown action: ${action}` });
