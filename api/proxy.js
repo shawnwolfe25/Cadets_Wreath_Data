@@ -37,14 +37,14 @@ async function redisGet(key) {
 }
 
 async function redisSet(key, value) {
-  // Store as a plain JSON string — no wrapping in an array
-  const r = await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}`, {
+  // Upstash REST SET: body must be ["key", "value"] as a JSON array command
+  const r = await fetch(`${REDIS_URL}/pipeline`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${REDIS_TOKEN}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify([JSON.stringify(value)])
+    body: JSON.stringify([["SET", key, JSON.stringify(value)]])
   });
   if (!r.ok) {
     const txt = await r.text();
