@@ -24,13 +24,11 @@
       gap: 18px;
       box-shadow: 0 2px 12px rgba(0,0,0,.3);
     }
-    header img { height: 52px; }
     header h1 { font-size: 1.4rem; font-weight: 700; line-height: 1.2; }
-    header p { font-size: .85rem; opacity: .75; margin-top: 2px; }
+    header p  { font-size: .85rem; opacity: .75; margin-top: 2px; }
 
     nav {
       display: flex;
-      gap: 0;
       background: #162039;
       padding: 0 32px;
     }
@@ -44,10 +42,7 @@
       border-bottom: 3px solid transparent;
       transition: all .2s;
     }
-    nav button.active, nav button:hover {
-      color: white;
-      border-bottom-color: #5b9bd5;
-    }
+    nav button.active, nav button:hover { color: white; border-bottom-color: #5b9bd5; }
 
     .toolbar {
       display: flex;
@@ -71,20 +66,13 @@
     .btn:hover { opacity: .85; }
     .btn-primary { background: #1a6fc4; color: white; }
     .btn-success { background: #2e7d32; color: white; }
-    .btn-danger  { background: #c62828; color: white; }
-    .btn-sm { padding: 5px 11px; font-size: .8rem; }
 
-    .status-bar {
-      font-size: .8rem;
-      color: #666;
-      margin-left: auto;
-      padding-right: 32px;
-    }
+    .status-bar { font-size: .8rem; color: #666; margin-left: auto; }
 
     /* CARDS */
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
       gap: 18px;
       padding: 18px 32px 32px;
     }
@@ -94,7 +82,6 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,.08);
       padding: 20px;
-      position: relative;
       border-top: 4px solid #1a6fc4;
       transition: transform .15s, box-shadow .15s;
     }
@@ -108,12 +95,12 @@
     }
 
     .card-stats {
-      display: flex;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-bottom: 14px;
     }
     .stat-box {
-      flex: 1;
       background: #f0f4fa;
       border-radius: 8px;
       padding: 10px;
@@ -125,14 +112,14 @@
       color: #1a6fc4;
     }
     .stat-box .lbl {
-      font-size: .72rem;
+      font-size: .7rem;
       color: #888;
       text-transform: uppercase;
       letter-spacing: .05em;
       margin-top: 2px;
     }
 
-    .progress-wrap { margin-bottom: 10px; }
+    .progress-wrap { margin-bottom: 12px; }
     .progress-label {
       display: flex;
       justify-content: space-between;
@@ -152,16 +139,18 @@
       transition: width .6s ease;
       background: linear-gradient(90deg, #1a6fc4, #5b9bd5);
     }
-    .progress-fill.done { background: linear-gradient(90deg, #2e7d32, #66bb6a); }
+    .progress-fill.met { background: linear-gradient(90deg, #2e7d32, #66bb6a); }
 
-    .card-meta {
-      font-size: .75rem;
-      color: #aaa;
+    .card-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: .75rem;
+      color: #aaa;
     }
-    .card-del {
+    .card-footer a { color: #1a6fc4; text-decoration: none; font-size: .75rem; }
+    .card-footer a:hover { text-decoration: underline; }
+    .btn-del {
       background: none;
       border: none;
       color: #e57373;
@@ -169,7 +158,25 @@
       font-size: .78rem;
       padding: 2px 4px;
     }
-    .card-del:hover { text-decoration: underline; }
+    .btn-del:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .badge-green  { background: #e8f5e9; color: #2e7d32; }
+    .badge-yellow { background: #fff8e1; color: #f57f17; }
+    .badge-red    { background: #ffebee; color: #c62828; }
+    .badge-gray   { background: #f0f0f0; color: #888; }
+
+    .scrape-error {
+      font-size: .72rem;
+      color: #c62828;
+      margin-top: 6px;
+    }
 
     /* CHART PAGE */
     #chart-page { padding: 24px 32px; display: none; }
@@ -179,7 +186,7 @@
       border-radius: 12px;
       padding: 24px;
       box-shadow: 0 2px 8px rgba(0,0,0,.08);
-      max-width: 900px;
+      max-width: 960px;
     }
 
     /* MODAL */
@@ -193,11 +200,12 @@
       background: white;
       border-radius: 14px;
       padding: 28px;
-      width: 400px;
+      width: 420px;
       max-width: 95vw;
       box-shadow: 0 8px 32px rgba(0,0,0,.2);
     }
-    .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
+    .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .modal-hint { font-size: .8rem; color: #888; margin-bottom: 18px; }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 5px; color: #444; }
     .form-group input {
@@ -210,7 +218,9 @@
       transition: border-color .15s;
     }
     .form-group input:focus { border-color: #1a6fc4; }
+    .form-hint { font-size: .75rem; color: #999; margin-top: 4px; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+    .modal-error { color: #c62828; font-size: .82rem; min-height: 18px; margin-top: 4px; }
 
     .empty-state {
       text-align: center;
@@ -219,7 +229,6 @@
       grid-column: 1/-1;
     }
     .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-    .empty-state p { font-size: .95rem; }
 
     .spinner {
       display: inline-block;
@@ -228,26 +237,11 @@
       border-top-color: white;
       border-radius: 50%;
       animation: spin .6s linear infinite;
-      margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-size: .72rem;
-      font-weight: 700;
-    }
-    .badge-green { background: #e8f5e9; color: #2e7d32; }
-    .badge-yellow { background: #fff8e1; color: #f57f17; }
-    .badge-red { background: #ffebee; color: #c62828; }
-
     @media (max-width: 600px) {
-      header { padding: 14px 16px; }
-      .toolbar { padding: 12px 16px 6px; }
-      .cards-grid { padding: 12px 16px 24px; }
-      #chart-page { padding: 16px; }
+      header, .toolbar, .cards-grid, #chart-page { padding-left: 16px; padding-right: 16px; }
     }
   </style>
 </head>
@@ -265,26 +259,29 @@
   <button onclick="showPage('chart')">📊 Goal vs. Progress</button>
 </nav>
 
+<!-- DASHBOARD -->
 <div id="dashboard-page">
   <div class="toolbar">
-    <button class="btn btn-success" onclick="openAddModal()">➕ Add Cadet</button>
+    <button class="btn btn-success" onclick="openModal()">➕ Add Cadet</button>
     <button class="btn btn-primary" id="refreshBtn" onclick="refreshData()">🔄 Refresh Data</button>
-    <div class="status-bar" id="statusBar">Loading...</div>
+    <span class="status-bar" id="statusBar">Loading...</span>
   </div>
   <div class="cards-grid" id="cardsGrid"></div>
 </div>
 
+<!-- CHART -->
 <div id="chart-page">
-  <h2>Goal vs. Wreaths Sold — All Cadets</h2>
+  <h2>📊 Goal vs. Wreaths Sold — All Cadets</h2>
   <div class="chart-wrap">
-    <canvas id="myChart" height="120"></canvas>
+    <canvas id="myChart" height="110"></canvas>
   </div>
 </div>
 
-<!-- Add Cadet Modal -->
+<!-- ADD CADET MODAL -->
 <div class="modal-overlay" id="addModal" style="display:none">
   <div class="modal">
     <h2>➕ Add Cadet</h2>
+    <p class="modal-hint">Enter the cadet's details and their personal WAA page URL.</p>
     <div class="form-group">
       <label>Cadet Name</label>
       <input id="inp-name" type="text" placeholder="e.g. Cadet Jane Smith" />
@@ -292,15 +289,17 @@
     <div class="form-group">
       <label>WAA Profile URL</label>
       <input id="inp-url" type="url" placeholder="https://wreathsacrossamerica.org/pages/XXXXXX/Overview" />
+      <div class="form-hint">Each cadet has their own unique page ID number in the URL.</div>
     </div>
     <div class="form-group">
-      <label>Personal Goal (wreaths)</label>
+      <label>Personal Wreath Goal</label>
       <input id="inp-goal" type="number" placeholder="e.g. 50" min="0" />
+      <div class="form-hint">The number of wreaths this cadet is personally aiming to sell.</div>
     </div>
-    <div id="addError" style="color:#c62828;font-size:.82rem;min-height:18px;"></div>
+    <div class="modal-error" id="addError"></div>
     <div class="modal-actions">
-      <button class="btn" style="background:#eee;color:#333" onclick="closeAddModal()">Cancel</button>
-      <button class="btn btn-success" id="addBtn" onclick="addCadet()">Add & Scrape</button>
+      <button class="btn" style="background:#eee;color:#333" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" id="addBtn" onclick="addCadet()">➕ Add & Scrape</button>
     </div>
   </div>
 </div>
@@ -310,27 +309,27 @@
   let cadets = [];
   let chart = null;
 
-  // ---- Page switcher ----
-  function showPage(page) {
+  // ---- Page nav ----
+  function showPage(p) {
     document.querySelectorAll("nav button").forEach((b, i) => {
-      b.classList.toggle("active", (i === 0 && page === "dashboard") || (i === 1 && page === "chart"));
+      b.classList.toggle("active", (p === "dashboard" && i === 0) || (p === "chart" && i === 1));
     });
-    document.getElementById("dashboard-page").style.display = page === "dashboard" ? "" : "none";
-    document.getElementById("chart-page").style.display = page === "chart" ? "" : "none";
-    if (page === "chart") renderChart();
+    document.getElementById("dashboard-page").style.display = p === "dashboard" ? "" : "none";
+    document.getElementById("chart-page").style.display = p === "chart" ? "" : "none";
+    if (p === "chart") renderChart();
   }
 
-  // ---- Load data ----
+  // ---- Load cadets ----
   async function loadCadets() {
-    setStatus("Loading cadets...");
+    setStatus("Loading...");
     try {
       const r = await fetch(`${API}?action=list`);
       const d = await r.json();
       cadets = d.cadets || [];
       renderCards();
-      setStatus(`Last loaded: ${new Date().toLocaleTimeString()} · ${cadets.length} cadet(s)`);
+      setStatus(`Loaded ${cadets.length} cadet(s) · ${timestamp()}`);
     } catch (e) {
-      setStatus("⚠️ Could not load data. Check API config.");
+      setStatus("⚠️ Could not load data.");
     }
   }
 
@@ -345,7 +344,7 @@
       cadets = d.cadets || [];
       renderCards();
       if (chart) renderChart();
-      setStatus(`Refreshed: ${new Date().toLocaleTimeString()} · ${cadets.length} cadet(s)`);
+      setStatus(`Refreshed ${cadets.length} cadet(s) · ${timestamp()}`);
     } catch (e) {
       setStatus("⚠️ Refresh failed.");
     }
@@ -353,51 +352,52 @@
     btn.disabled = false;
   }
 
-  // ---- Add cadet ----
-  function openAddModal() {
+  // ---- Modal ----
+  function openModal() {
     document.getElementById("addModal").style.display = "flex";
     document.getElementById("addError").textContent = "";
-    document.getElementById("inp-name").value = "";
-    document.getElementById("inp-url").value = "";
-    document.getElementById("inp-goal").value = "";
+    ["inp-name","inp-url","inp-goal"].forEach(id => document.getElementById(id).value = "");
   }
-  function closeAddModal() {
+  function closeModal() {
     document.getElementById("addModal").style.display = "none";
   }
 
+  // ---- Add cadet ----
   async function addCadet() {
     const name = document.getElementById("inp-name").value.trim();
     const url  = document.getElementById("inp-url").value.trim();
-    const goal = parseInt(document.getElementById("inp-goal").value, 10) || 0;
+    const goal = document.getElementById("inp-goal").value.trim();
     const errEl = document.getElementById("addError");
 
-    if (!name) { errEl.textContent = "Please enter cadet name."; return; }
+    if (!name) { errEl.textContent = "Please enter the cadet's name."; return; }
     if (!url || !url.startsWith("http")) { errEl.textContent = "Please enter a valid WAA URL."; return; }
+    if (!goal || parseInt(goal) < 1) { errEl.textContent = "Please enter a personal wreath goal (e.g. 50)."; return; }
 
     const btn = document.getElementById("addBtn");
     btn.innerHTML = `<span class="spinner"></span> Scraping...`;
     btn.disabled = true;
+    errEl.textContent = "";
 
     try {
       const r = await fetch(`${API}?action=add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, url, goal })
+        body: JSON.stringify({ name, url, goal: parseInt(goal) })
       });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       cadets.push(d.cadet);
       renderCards();
-      closeAddModal();
+      closeModal();
       setStatus(`Added ${name} · ${cadets.length} cadet(s)`);
     } catch (e) {
       errEl.textContent = "Error: " + e.message;
     }
-    btn.innerHTML = "Add & Scrape";
+    btn.innerHTML = "➕ Add & Scrape";
     btn.disabled = false;
   }
 
-  // ---- Delete cadet ----
+  // ---- Delete ----
   async function deleteCadet(id, name) {
     if (!confirm(`Remove ${name} from the tracker?`)) return;
     await fetch(`${API}?action=delete&id=${id}`, { method: "DELETE" });
@@ -411,45 +411,67 @@
   function renderCards() {
     const grid = document.getElementById("cardsGrid");
     if (!cadets.length) {
-      grid.innerHTML = `<div class="empty-state"><div class="icon">🎗️</div><p>No cadets yet.<br>Click <strong>Add Cadet</strong> to get started.</p></div>`;
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🎗️</div>
+          <p>No cadets added yet.<br>Click <strong>Add Cadet</strong> to get started.</p>
+        </div>`;
       return;
     }
+
     grid.innerHTML = cadets.map(c => {
-      const pct = c.goal > 0 ? Math.min(100, Math.round((c.sold / c.goal) * 100)) : 0;
-      const done = pct >= 100;
-      const badge = pct >= 100
+      const sold = c.sold ?? 0;
+      const goal = c.goal ?? 0;
+      const pct  = goal > 0 ? Math.min(100, Math.round((sold / goal) * 100)) : 0;
+      const met  = pct >= 100;
+
+      const badge = !goal
+        ? `<span class="badge badge-gray">No Goal Set</span>`
+        : met
         ? `<span class="badge badge-green">✅ Goal Met!</span>`
         : pct >= 75
         ? `<span class="badge badge-yellow">🔥 Almost There</span>`
         : `<span class="badge badge-red">🎯 In Progress</span>`;
+
       const updated = c.lastUpdated
-        ? new Date(c.lastUpdated).toLocaleDateString()
+        ? new Date(c.lastUpdated).toLocaleString()
         : "—";
+
+      const errorNote = c.scrapeError
+        ? `<div class="scrape-error">⚠️ Last scrape error: ${c.scrapeError}</div>`
+        : "";
+
       return `
         <div class="card">
           <div class="card-name">${c.name}</div>
           <div class="card-stats">
             <div class="stat-box">
-              <div class="val">${c.sold ?? 0}</div>
-              <div class="lbl">Sold (${c.year ?? new Date().getFullYear()})</div>
+              <div class="val">${sold}</div>
+              <div class="lbl">Wreaths Sold</div>
+              <div style="font-size:.7rem;color:#aaa;margin-top:2px">${c.year ?? ""}</div>
             </div>
             <div class="stat-box">
-              <div class="val">${c.goal ?? 0}</div>
-              <div class="lbl">Goal</div>
+              <div class="val">${goal}</div>
+              <div class="lbl">Personal Goal</div>
             </div>
           </div>
           <div class="progress-wrap">
             <div class="progress-label">
               <span>${badge}</span>
-              <span>${pct}%</span>
+              <span>${pct}% of goal</span>
             </div>
             <div class="progress-bar">
-              <div class="progress-fill ${done ? 'done' : ''}" style="width:${pct}%"></div>
+              <div class="progress-fill ${met ? "met" : ""}" style="width:${pct}%"></div>
             </div>
           </div>
-          <div class="card-meta">
+          ${errorNote}
+          <div class="card-footer">
             <span>Updated: ${updated}</span>
-            <button class="card-del" onclick="deleteCadet('${c.id}','${c.name}')">✕ Remove</button>
+            <span>
+              <a href="${c.url}" target="_blank">WAA Page ↗</a>
+              &nbsp;·&nbsp;
+              <button class="btn-del" onclick="deleteCadet('${c.id}','${c.name}')">✕ Remove</button>
+            </span>
           </div>
         </div>`;
     }).join("");
@@ -458,32 +480,31 @@
   // ---- Chart ----
   function renderChart() {
     const labels = cadets.map(c => c.name.replace(/^Cadet\s+/i, ""));
-    const goals  = cadets.map(c => c.goal || 0);
-    const sold   = cadets.map(c => c.sold || 0);
+    const goals  = cadets.map(c => c.goal  || 0);
+    const sold   = cadets.map(c => c.sold  || 0);
 
     if (chart) chart.destroy();
-    const ctx = document.getElementById("myChart").getContext("2d");
-    chart = new Chart(ctx, {
+    chart = new Chart(document.getElementById("myChart").getContext("2d"), {
       type: "bar",
       data: {
         labels,
         datasets: [
           {
-            label: "Goal",
+            label: "Personal Goal",
             data: goals,
-            backgroundColor: "rgba(26, 111, 196, 0.25)",
-            borderColor: "rgba(26, 111, 196, 0.8)",
+            backgroundColor: "rgba(26,111,196,0.2)",
+            borderColor: "rgba(26,111,196,0.8)",
             borderWidth: 2,
             borderRadius: 6
           },
           {
             label: "Wreaths Sold",
             data: sold,
-            backgroundColor: sold.map((s, i) =>
-              s >= goals[i] ? "rgba(46, 125, 50, 0.75)" : "rgba(198, 40, 40, 0.65)"
+            backgroundColor: sold.map((s,i) =>
+              s >= goals[i] ? "rgba(46,125,50,0.75)" : "rgba(198,40,40,0.65)"
             ),
-            borderColor: sold.map((s, i) =>
-              s >= goals[i] ? "rgba(46, 125, 50, 1)" : "rgba(198, 40, 40, 1)"
+            borderColor: sold.map((s,i) =>
+              s >= goals[i] ? "rgba(46,125,50,1)" : "rgba(198,40,40,1)"
             ),
             borderWidth: 2,
             borderRadius: 6
@@ -496,35 +517,27 @@
           legend: { position: "top" },
           tooltip: {
             callbacks: {
-              afterLabel: (ctx) => {
+              afterLabel: ctx => {
                 if (ctx.datasetIndex === 1) {
                   const g = goals[ctx.dataIndex];
                   const s = sold[ctx.dataIndex];
-                  const pct = g > 0 ? Math.round((s / g) * 100) : 0;
-                  return `${pct}% of goal`;
+                  return g > 0 ? `${Math.round((s/g)*100)}% of goal` : "";
                 }
               }
             }
           }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            title: { display: true, text: "Wreaths" }
-          },
-          x: {
-            title: { display: true, text: "Cadet" }
-          }
+          y: { beginAtZero: true, title: { display: true, text: "Wreaths" } },
+          x: { title: { display: true, text: "Cadet" } }
         }
       }
     });
   }
 
-  function setStatus(msg) {
-    document.getElementById("statusBar").textContent = msg;
-  }
+  function setStatus(msg) { document.getElementById("statusBar").textContent = msg; }
+  function timestamp() { return new Date().toLocaleTimeString(); }
 
-  // ---- Init ----
   loadCadets();
 </script>
 </body>
