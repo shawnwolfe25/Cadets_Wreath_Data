@@ -1,7 +1,3 @@
-// api/proxy.js — Vercel Serverless Function
-// WAA sold count is JS-rendered — scraper used as best-effort fallback.
-// Manual sold override stored per-cadet and used when scrape returns 0.
-
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const PASS_ADMIN  = process.env.WAA_PASS_ADMIN;
@@ -31,7 +27,7 @@ async function redisGet(key) {
   return Array.isArray(val) ? val : [];
 }
 
-// --- Redis SET (pipeline) ---
+// --- Redis SET ---
 async function redisSet(key, value) {
   const r = await fetch(`${REDIS_URL}/pipeline`, {
     method: "POST",
@@ -41,7 +37,7 @@ async function redisSet(key, value) {
   if (!r.ok) throw new Error(`Redis SET failed: ${await r.text()}`);
 }
 
-// --- WAA Scraper (best-effort — sold count is JS-rendered, may return 0) ---
+// --- WAA Scraper ---
 async function scrapeWAAPage(url) {
   try {
     const res = await fetch(url, {
@@ -49,28 +45,13 @@ async function scrapeWAAPage(url) {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
-
-    // Year — static in HTML
     const yearMatch = html.match(/(\d{4})\s+So\s+Far/i);
     const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
-
-    // Sold — JS-rendered, will almost always be 0 from static HTML
     const soldMatch = html.match(/(\d[\d,]*)\s+Wreaths?\s+so\s+Far/i);
     const scrapedSold = soldMatch ? parseInt(soldMatch[1].replace(/,/g, ""), 10) : 0;
-
-    // Try to find gauge image as a hint (wreath_00.png = 0, wreath_50.png = ~50%, etc.)
-    const gaugeMatch = html.match(/wreath_(\d+)\.(?:png|webp)/i);
-    const gaugePct = gaugeMatch ? parseInt(gaugeMatch[1], 10) : 0;
-
-    return {
-      scrapedSold,
-      gaugePct,   // 0–100 rough indicator from gauge image name
-      year,
-      lastUpdated: new Date().toISOString(),
-      scrapeError: null
-    };
+    return { scrapedSold, year, lastUpdated: new Date().toISOString(), scrapeError: null };
   } catch (err) {
-    return { scrapedSold: 0, gaugePct: 0, year: new Date().getFullYear(), lastUpdated: new Date().toISOString(), scrapeError: err.message };
+    return { scrapedSold: 0, year: new Date().getFullYear(), lastUpdated: new Date().toISOString(), scrapeError: err.message };
   }
 }
 
@@ -99,10 +80,22 @@ module.exports = async function handler(req, res) {
 
     // ── LOGIN ──
     if (req.method === "POST" && action === "login") {
-      const { password } = await parseBody(req);
+      const body = await parseBody(req);
+      const password = body.password;
+      if (!password) return res.status(400).json({ error: "Password required" });
       if (password === PASS_ADMIN) return res.status(200).json({ role: "admin" });
       if (password === PASS_READ)  return res.status(200).json({ role: "readonly" });
-      return res.status(401).json({ error: "Invalid password" });
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    // ── DEBUG ──
+    if (req.method === "GET" && action === "debug") {
+      return res.status(200).json({
+        hasRedisUrl:   !!REDIS_URL,
+        hasRedisToken: !!REDIS_TOKEN,
+        hasPassAdmin:  !!PASS_ADMIN,
+        hasPassRead:   !!PASS_READ
+      });
     }
 
     // ── LIST ──
@@ -115,21 +108,14 @@ module.exports = async function handler(req, res) {
     if (req.method === "POST" && action === "add") {
       const { name, url: waaUrl, goal, manualSold } = await parseBody(req);
       if (!name || !waaUrl) return res.status(400).json({ error: "name and url are required" });
-
       const cadets  = await redisGet(CADETS_KEY);
       const scraped = await scrapeWAAPage(waaUrl);
-
-      // Use manualSold if provided, otherwise use scraper result
-      const sold = (manualSold !== undefined && manualSold !== "")
-        ? parseInt(manualSold, 10) || 0
-        : scraped.scrapedSold;
-
+      const sold = (manualSold !== undefined && manualSold !== "") ? parseInt(manualSold, 10) || 0 : scraped.scrapedSold;
       const newCadet = {
         id: Date.now().toString(),
         name, url: waaUrl,
         goal: parseInt(goal, 10) || 0,
-        sold,
-        manualSold: sold,   // remember the last manually set value
+        sold, manualSold: sold,
         year: scraped.year,
         lastUpdated: scraped.lastUpdated,
         scrapeError: scraped.scrapeError
@@ -139,15 +125,13 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ cadet: newCadet });
     }
 
-    // ── EDIT (name, goal, and manual sold override) ──
+    // ── EDIT ──
     if (req.method === "PUT" && action === "edit") {
       const { name, goal, manualSold } = await parseBody(req);
       if (!id) return res.status(400).json({ error: "id is required" });
-
       const cadets = await redisGet(CADETS_KEY);
       const idx = cadets.findIndex(c => c.id === id);
       if (idx === -1) return res.status(404).json({ error: "Cadet not found" });
-
       if (name) cadets[idx].name = name.trim();
       if (goal !== undefined) cadets[idx].goal = parseInt(goal, 10) || 0;
       if (manualSold !== undefined && manualSold !== "") {
@@ -155,31 +139,23 @@ module.exports = async function handler(req, res) {
         cadets[idx].sold = s;
         cadets[idx].manualSold = s;
       }
-
       await redisSet(CADETS_KEY, cadets);
       return res.status(200).json({ cadet: cadets[idx] });
     }
 
     // ── REFRESH ──
-    // Tries scraper — if it returns > 0 it's a lucky hit; otherwise keeps manualSold.
     if (req.method === "POST" && action === "refresh") {
       const cadets  = await redisGet(CADETS_KEY);
       const updated = await Promise.all(cadets.map(async c => {
         const scraped = await scrapeWAAPage(c.url);
-
-        // Only update sold from scraper if it returns a non-zero value
-        // (zero almost certainly means JS-rendering blocked it)
-        const soldToUse = scraped.scrapedSold > 0
-          ? scraped.scrapedSold
-          : (c.manualSold ?? c.sold ?? 0);
-
+        const soldToUse = scraped.scrapedSold > 0 ? scraped.scrapedSold : (c.manualSold ?? c.sold ?? 0);
         return {
           ...c,
           sold: soldToUse,
           year: scraped.year,
           lastUpdated: scraped.lastUpdated,
           scrapeError: scraped.scrapedSold === 0 && !scraped.scrapeError
-            ? "Live count JS-rendered — showing last known value. Update manually if needed."
+            ? "Live count is JS-rendered — showing last known value."
             : scraped.scrapeError
         };
       }));
