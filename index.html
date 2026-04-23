@@ -423,27 +423,27 @@
     const pass  = document.getElementById("login-pass").value;
     const btn   = document.getElementById("loginBtn");
     const errEl = document.getElementById("loginErr");
-    if (!pass) return;
+    if (!pass) { errEl.textContent = "Please enter a password."; errEl.style.display = "block"; return; }
 
     btn.innerHTML = `<span class="spinner"></span> Signing in…`;
     btn.disabled  = true;
     errEl.style.display = "none";
 
     try {
-      const r = await fetch(`${API}?action=login`, {
+      const r = await fetch(`/api/proxy?action=login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: pass })
       });
       let d;
-      try { d = await r.json(); } catch { throw new Error(`Server error (HTTP ${r.status})`); }
+      try { d = await r.json(); } catch { throw new Error(`Server returned non-JSON (HTTP ${r.status})`); }
       if (!r.ok || d.error) throw new Error(d?.error || `HTTP ${r.status}`);
 
       userRole = d.role;
       sessionStorage.setItem("waa_role", d.role);
       showApp();
     } catch(e) {
-      errEl.textContent = e.message || "Incorrect password. Please try again.";
+      errEl.textContent = "Error: " + (e.message || "Unknown error");
       errEl.style.display = "block";
       btn.innerHTML = "🔓 Sign In";
       btn.disabled  = false;
