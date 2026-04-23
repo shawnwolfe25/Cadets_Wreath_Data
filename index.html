@@ -435,13 +435,15 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: pass })
       });
-      const d = await r.json();
-      if (d.error) throw new Error(d.error);
+      let d;
+      try { d = await r.json(); } catch { throw new Error(`Server error (HTTP ${r.status})`); }
+      if (!r.ok || d.error) throw new Error(d?.error || `HTTP ${r.status}`);
 
       userRole = d.role;
       sessionStorage.setItem("waa_role", d.role);
       showApp();
-    } catch {
+    } catch(e) {
+      errEl.textContent = e.message || "Incorrect password. Please try again.";
       errEl.style.display = "block";
       btn.innerHTML = "🔓 Sign In";
       btn.disabled  = false;
