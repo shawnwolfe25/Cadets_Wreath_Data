@@ -273,11 +273,13 @@
     <h1>CAP Springfield Squadron</h1>
     <p>Wreaths Across America — Cadet Fundraising Tracker</p>
     <div class="login-divider">Enter your access password</div>
-    <div class="login-field">
-      <span class="field-icon">🔒</span>
-      <input id="login-pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter') submitLogin()"/>
-    </div>
-    <button class="login-btn" id="loginBtn" onclick="submitLogin()">🔓 Sign In</button>
+    <form onsubmit="submitLogin();return false;">
+      <div class="login-field">
+        <span class="field-icon">🔒</span>
+        <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
+      </div>
+      <button class="login-btn" id="loginBtn" type="submit">🔓 Sign In</button>
+    </form>
     <div class="login-err" id="loginErr">Incorrect password. Please try again.</div>
     <div class="login-footer">Contact your squadron administrator if you need access.<br><span>Civil Air Patrol · Springfield Composite Squadron</span></div>
   </div>
