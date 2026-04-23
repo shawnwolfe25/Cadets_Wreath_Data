@@ -25,269 +25,166 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── LOGIN SCREEN ── */
-    #login-screen {
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, var(--navy) 0%, #0a2540 50%, #1a3a5c 100%);
-    }
-    .login-box {
-      background: white; border-radius: 20px;
-      padding: 44px 40px; width: 400px; max-width: 95vw;
-      box-shadow: 0 24px 80px rgba(0,0,0,.4);
-      text-align: center;
-    }
-    .login-emblem {
-      width: 72px; height: 72px; border-radius: 18px;
-      background: linear-gradient(135deg, var(--navy), var(--navy2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 34px; margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(13,27,42,.3);
-    }
-    .login-box h1 { font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
-    .login-box p  { font-size: .82rem; color: var(--muted); margin-bottom: 28px; }
-    .login-divider {
-      display: flex; align-items: center; gap: 10px;
-      font-size: .72rem; color: var(--muted); margin-bottom: 20px;
-    }
-    .login-divider::before, .login-divider::after {
-      content: ""; flex: 1; height: 1px; background: var(--border);
-    }
-    .login-field {
-      position: relative; margin-bottom: 14px;
-    }
-    .login-field input {
-      width: 100%; padding: 13px 16px 13px 44px;
-      border: 1.5px solid var(--border); border-radius: 10px;
-      font-size: .95rem; outline: none; transition: border-color .2s;
-      background: #f8faff;
-    }
-    .login-field input:focus { border-color: var(--blue2); background: white; }
-    .login-field .field-icon {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      font-size: 16px; pointer-events: none;
-    }
-    .login-btn {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      color: white; border: none; border-radius: 10px;
-      font-size: 1rem; font-weight: 700; cursor: pointer;
-      transition: opacity .2s; margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .login-btn:hover { opacity: .9; }
-    .login-err {
-      background: #ffebee; color: var(--red);
-      border-radius: 8px; padding: 10px 14px;
-      font-size: .82rem; font-weight: 600;
-      min-height: 0; display: none; margin-top: 8px;
-    }
-    .login-footer { font-size: .72rem; color: var(--muted); margin-top: 20px; }
-    .login-footer span { color: var(--accent); font-weight: 700; }
+    /* LOGIN */
+    #login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--navy) 0%,#0a2540 50%,#1a3a5c 100%); }
+    .login-box { background:white; border-radius:20px; padding:44px 40px; width:400px; max-width:95vw; box-shadow:0 24px 80px rgba(0,0,0,.4); text-align:center; }
+    .login-emblem { width:72px; height:72px; border-radius:18px; background:linear-gradient(135deg,var(--navy),var(--navy2)); display:flex; align-items:center; justify-content:center; font-size:34px; margin:0 auto 20px; box-shadow:0 8px 24px rgba(13,27,42,.3); }
+    .login-box h1 { font-size:1.25rem; font-weight:800; color:var(--navy); margin-bottom:4px; }
+    .login-box p  { font-size:.82rem; color:var(--muted); margin-bottom:28px; }
+    .login-divider { display:flex; align-items:center; gap:10px; font-size:.72rem; color:var(--muted); margin-bottom:20px; }
+    .login-divider::before,.login-divider::after { content:""; flex:1; height:1px; background:var(--border); }
+    .login-field { position:relative; margin-bottom:14px; }
+    .login-field input { width:100%; padding:13px 16px 13px 44px; border:1.5px solid var(--border); border-radius:10px; font-size:.95rem; outline:none; transition:border-color .2s; background:#f8faff; }
+    .login-field input:focus { border-color:var(--blue2); background:white; }
+    .login-field .field-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+    .login-btn { width:100%; padding:13px; background:linear-gradient(135deg,var(--blue),var(--blue2)); color:white; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity .2s; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .login-btn:hover { opacity:.9; }
+    .login-err { background:#ffebee; color:var(--red); border-radius:8px; padding:10px 14px; font-size:.82rem; font-weight:600; display:none; margin-top:8px; }
+    .login-footer { font-size:.72rem; color:var(--muted); margin-top:20px; }
+    .login-footer span { color:var(--accent); font-weight:700; }
 
-    /* ── APP (hidden until login) ── */
-    #app { display: none; }
+    /* APP */
+    #app { display:none; }
 
-    /* ── HEADER ── */
-    .site-header {
-      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
-      padding: 0 32px; display: flex; align-items: stretch;
-      box-shadow: 0 3px 16px rgba(0,0,0,.35);
-      position: sticky; top: 0; z-index: 50;
-    }
-    .header-brand {
-      display: flex; align-items: center; gap: 14px;
-      padding: 16px 0; border-right: 1px solid rgba(255,255,255,.1);
-      padding-right: 24px; margin-right: 24px;
-    }
-    .header-icon {
-      width: 44px; height: 44px; background: var(--accent);
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-size: 22px; flex-shrink: 0;
-    }
-    .header-title h1 { font-size: 1.05rem; font-weight: 700; color: white; letter-spacing: .01em; }
-    .header-title p  { font-size: .75rem; color: rgba(255,255,255,.55); margin-top: 2px; }
-    .header-nav { display: flex; align-items: center; gap: 4px; }
-    .nav-btn {
-      background: none; border: none; color: rgba(255,255,255,.6);
-      padding: 8px 16px; border-radius: 8px; font-size: .85rem;
-      font-weight: 600; cursor: pointer; transition: all .2s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,.12); color: white; }
-    .nav-btn.active { color: var(--accent); }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    .status-pill {
-      font-size: .72rem; color: rgba(255,255,255,.45);
-      padding: 4px 10px; border-radius: 99px;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .role-pill {
-      font-size: .72rem; font-weight: 700;
-      padding: 4px 10px; border-radius: 99px;
-    }
-    .role-pill.admin    { background: rgba(200,169,81,.2); color: var(--accent); border: 1px solid rgba(200,169,81,.4); }
-    .role-pill.readonly { background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.15); }
-    .hbtn {
-      padding: 8px 16px; border-radius: 8px; border: none;
-      font-size: .82rem; font-weight: 600; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; transition: all .2s;
-    }
-    .hbtn:hover { opacity: .85; }
-    .hbtn-outline { background: rgba(255,255,255,.1); color: white; border: 1px solid rgba(255,255,255,.2); }
-    .hbtn-gold    { background: var(--accent); color: var(--navy); }
-    .hbtn-ghost   { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.1); font-size: .75rem; }
-    .hbtn-ghost:hover { background: rgba(255,255,255,.12); color: white; }
+    /* HEADER */
+    .site-header { background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); padding:0 32px; display:flex; align-items:stretch; box-shadow:0 3px 16px rgba(0,0,0,.35); position:sticky; top:0; z-index:50; }
+    .header-brand { display:flex; align-items:center; gap:14px; padding:16px 0; border-right:1px solid rgba(255,255,255,.1); padding-right:24px; margin-right:24px; }
+    .header-icon { width:44px; height:44px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .header-title h1 { font-size:1.05rem; font-weight:700; color:white; letter-spacing:.01em; }
+    .header-title p  { font-size:.75rem; color:rgba(255,255,255,.55); margin-top:2px; }
+    .header-nav { display:flex; align-items:center; gap:4px; }
+    .nav-btn { background:none; border:none; color:rgba(255,255,255,.6); padding:8px 16px; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:6px; }
+    .nav-btn:hover,.nav-btn.active { background:rgba(255,255,255,.12); color:white; }
+    .nav-btn.active { color:var(--accent); }
+    .header-actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .status-pill { font-size:.72rem; color:rgba(255,255,255,.45); padding:4px 10px; border-radius:99px; border:1px solid rgba(255,255,255,.12); }
+    .role-pill { font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:99px; }
+    .role-pill.admin    { background:rgba(200,169,81,.2); color:var(--accent); border:1px solid rgba(200,169,81,.4); }
+    .role-pill.readonly { background:rgba(255,255,255,.08); color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.15); }
+    .hbtn { padding:8px 16px; border-radius:8px; border:none; font-size:.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all .2s; }
+    .hbtn:hover { opacity:.85; }
+    .hbtn-outline { background:rgba(255,255,255,.1); color:white; border:1px solid rgba(255,255,255,.2); }
+    .hbtn-gold    { background:var(--accent); color:var(--navy); }
+    .hbtn-ghost   { background:rgba(255,255,255,.06); color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.1); font-size:.75rem; }
+    .hbtn-ghost:hover { background:rgba(255,255,255,.12); color:white; }
 
-    /* ── PAGES ── */
-    #page-dashboard, #page-chart { padding: 28px 32px 40px; }
-    #page-chart { display: none; }
+    /* PAGES */
+    #page-dashboard,#page-chart { padding:28px 32px 40px; }
+    #page-chart { display:none; }
 
-    /* ── SUMMARY ROW ── */
-    .summary-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
-    .sum-card {
-      background: var(--card); border-radius: 12px;
-      border: 1px solid var(--border); padding: 18px 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
-      display: flex; align-items: center; gap: 14px;
-    }
-    .sum-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .sum-icon.blue   { background: #e3f2fd; }
-    .sum-icon.green  { background: #e8f5e9; }
-    .sum-icon.gold   { background: #fff8e1; }
-    .sum-icon.purple { background: #ede7f6; }
-    .sum-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
-    .sum-lbl { font-size: .75rem; color: var(--muted); margin-top: 3px; }
+    /* SUMMARY */
+    .summary-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .sum-card { background:var(--card); border-radius:12px; border:1px solid var(--border); padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.06); display:flex; align-items:center; gap:14px; }
+    .sum-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .sum-icon.blue   { background:#e3f2fd; }
+    .sum-icon.green  { background:#e8f5e9; }
+    .sum-icon.gold   { background:#fff8e1; }
+    .sum-icon.purple { background:#ede7f6; }
+    .sum-val { font-size:1.6rem; font-weight:800; line-height:1; }
+    .sum-lbl { font-size:.75rem; color:var(--muted); margin-top:3px; }
 
-    /* ── TABLE ── */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .section-title  { font-size: 1rem; font-weight: 700; color: var(--navy); }
-    .section-sub    { font-size: .78rem; color: var(--muted); margin-top: 2px; }
-    .table-wrap {
-      background: var(--card); border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 28px;
-    }
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: var(--navy); }
-    thead th {
-      padding: 13px 18px; text-align: left;
-      font-size: .75rem; font-weight: 700;
-      color: rgba(255,255,255,.7); letter-spacing: .06em; text-transform: uppercase;
-    }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #f8faff; }
-    td { padding: 14px 18px; font-size: .88rem; vertical-align: middle; }
-    .td-name { font-weight: 700; color: var(--navy); }
-    .td-link { font-size: .75rem; color: var(--blue2); text-decoration: none; display: block; margin-top: 2px; }
-    .td-link:hover { text-decoration: underline; }
-    .td-num  { font-size: 1rem; font-weight: 700; color: var(--blue); }
-    .td-goal { font-size: 1rem; font-weight: 700; color: var(--muted); }
+    /* TABLE */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .section-title  { font-size:1rem; font-weight:700; color:var(--navy); }
+    .section-sub    { font-size:.78rem; color:var(--muted); margin-top:2px; }
+    .table-wrap { background:var(--card); border-radius:14px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.06); overflow:hidden; margin-bottom:28px; }
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:var(--navy); }
+    thead th { padding:13px 18px; text-align:left; font-size:.75rem; font-weight:700; color:rgba(255,255,255,.7); letter-spacing:.06em; text-transform:uppercase; }
+    tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:#f8faff; }
+    td { padding:14px 18px; font-size:.88rem; vertical-align:middle; }
+    .td-name { font-weight:700; color:var(--navy); }
+    .td-link { font-size:.75rem; color:var(--blue2); text-decoration:none; display:block; margin-top:2px; }
+    .td-link:hover { text-decoration:underline; }
+    .td-num  { font-size:1rem; font-weight:700; color:var(--blue); }
+    .td-goal { font-size:1rem; font-weight:700; color:var(--muted); }
+    .bar-wrap  { display:flex; align-items:center; gap:10px; min-width:160px; }
+    .bar-track { flex:1; height:8px; background:#e0e7ef; border-radius:99px; overflow:hidden; }
+    .bar-fill  { height:100%; border-radius:99px; transition:width .5s ease; }
+    .bar-fill.low  { background:linear-gradient(90deg,var(--red),#ef5350); }
+    .bar-fill.mid  { background:linear-gradient(90deg,var(--yellow),#ffca28); }
+    .bar-fill.high { background:linear-gradient(90deg,var(--green),var(--green2)); }
+    .bar-pct { font-size:.78rem; font-weight:700; width:36px; text-align:right; }
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; white-space:nowrap; }
+    .badge-green  { background:#e8f5e9; color:#1b5e20; }
+    .badge-yellow { background:#fff8e1; color:#e65100; }
+    .badge-red    { background:#ffebee; color:#b71c1c; }
+    .badge-gray   { background:#f0f0f0; color:#666; }
+    .td-actions { display:flex; gap:6px; }
+    .act-btn { padding:5px 12px; border-radius:6px; border:none; font-size:.75rem; font-weight:600; cursor:pointer; transition:all .15s; }
+    .act-edit { background:#e3f2fd; color:var(--blue); }
+    .act-edit:hover { background:#bbdefb; }
+    .act-del  { background:#ffebee; color:var(--red); }
+    .act-del:hover  { background:#ffcdd2; }
+    .empty-row td { text-align:center; padding:60px; color:var(--muted); font-size:.9rem; }
 
-    .bar-wrap  { display: flex; align-items: center; gap: 10px; min-width: 160px; }
-    .bar-track { flex: 1; height: 8px; background: #e0e7ef; border-radius: 99px; overflow: hidden; }
-    .bar-fill  { height: 100%; border-radius: 99px; transition: width .5s ease; }
-    .bar-fill.low  { background: linear-gradient(90deg, var(--red),   #ef5350); }
-    .bar-fill.mid  { background: linear-gradient(90deg, var(--yellow), #ffca28); }
-    .bar-fill.high { background: linear-gradient(90deg, var(--green),  var(--green2)); }
-    .bar-pct { font-size: .78rem; font-weight: 700; width: 36px; text-align: right; }
+    /* CHARTS */
+    .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:28px; }
+    .chart-card { background:var(--card); border-radius:14px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.06); padding:24px; }
+    .chart-card h3 { font-size:.9rem; font-weight:700; color:var(--navy); margin-bottom:18px; }
+    .leaderboard { list-style:none; }
+    .lb-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .lb-row:last-child { border-bottom:none; }
+    .lb-rank { width:26px; height:26px; border-radius:50%; background:var(--navy); color:white; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:800; flex-shrink:0; }
+    .lb-rank.gold   { background:#f9a825; color:#333; }
+    .lb-rank.silver { background:#9e9e9e; }
+    .lb-rank.bronze { background:#a1887f; }
+    .lb-name { flex:1; font-size:.85rem; font-weight:600; }
+    .lb-pct  { font-size:.82rem; font-weight:700; color:var(--blue); }
 
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
-    .badge-green  { background: #e8f5e9; color: #1b5e20; }
-    .badge-yellow { background: #fff8e1; color: #e65100; }
-    .badge-red    { background: #ffebee; color: #b71c1c; }
-    .badge-gray   { background: #f0f0f0; color: #666; }
+    /* MODALS */
+    .overlay { position:fixed; inset:0; background:rgba(10,20,40,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
+    .modal { background:white; border-radius:16px; padding:30px; width:440px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .modal-head h2 { font-size:1.1rem; font-weight:700; }
+    .modal-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--muted); }
+    .modal-close:hover { color:var(--text); }
+    .fgroup { margin-bottom:16px; }
+    .fgroup label { display:block; font-size:.82rem; font-weight:600; color:#444; margin-bottom:5px; }
+    .fgroup input { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:8px; font-size:.9rem; outline:none; transition:border-color .15s; }
+    .fgroup input:focus { border-color:var(--blue2); }
+    .fhint { font-size:.72rem; color:var(--muted); margin-top:4px; }
+    .modal-err { color:var(--red); font-size:.8rem; min-height:18px; margin-bottom:4px; }
+    .modal-foot { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .mbtn { padding:10px 20px; border-radius:8px; border:none; font-size:.85rem; font-weight:600; cursor:pointer; transition:opacity .15s; display:flex; align-items:center; gap:6px; }
+    .mbtn:hover { opacity:.85; }
+    .mbtn-cancel { background:#eef0f4; color:#555; }
+    .mbtn-green  { background:var(--green); color:white; }
+    .mbtn-blue   { background:var(--blue);  color:white; }
 
-    .td-actions { display: flex; gap: 6px; }
-    .act-btn { padding: 5px 12px; border-radius: 6px; border: none; font-size: .75rem; font-weight: 600; cursor: pointer; transition: all .15s; }
-    .act-edit { background: #e3f2fd; color: var(--blue); }
-    .act-edit:hover { background: #bbdefb; }
-    .act-del  { background: #ffebee; color: var(--red); }
-    .act-del:hover  { background: #ffcdd2; }
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.35); border-top-color:white; border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    .empty-row td { text-align: center; padding: 60px; color: var(--muted); font-size: .9rem; }
-
-    /* ── CHARTS ── */
-    .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
-    .chart-card {
-      background: var(--card); border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 4px rgba(0,0,0,.06); padding: 24px;
-    }
-    .chart-card h3 { font-size: .9rem; font-weight: 700; color: var(--navy); margin-bottom: 18px; }
-    .leaderboard { list-style: none; }
-    .lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .lb-row:last-child { border-bottom: none; }
-    .lb-rank { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 800; flex-shrink: 0; }
-    .lb-rank.gold   { background: #f9a825; color: #333; }
-    .lb-rank.silver { background: #9e9e9e; }
-    .lb-rank.bronze { background: #a1887f; }
-    .lb-name { flex: 1; font-size: .85rem; font-weight: 600; }
-    .lb-pct  { font-size: .82rem; font-weight: 700; color: var(--blue); }
-
-    /* ── MODALS ── */
-    .overlay { position: fixed; inset: 0; background: rgba(10,20,40,.55); display: flex; align-items: center; justify-content: center; z-index: 200; }
-    .modal { background: white; border-radius: 16px; padding: 30px; width: 440px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .modal-head h2 { font-size: 1.1rem; font-weight: 700; }
-    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); }
-    .modal-close:hover { color: var(--text); }
-    .fgroup { margin-bottom: 16px; }
-    .fgroup label { display: block; font-size: .82rem; font-weight: 600; color: #444; margin-bottom: 5px; }
-    .fgroup input { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-size: .9rem; outline: none; transition: border-color .15s; }
-    .fgroup input:focus { border-color: var(--blue2); }
-    .fhint { font-size: .72rem; color: var(--muted); margin-top: 4px; }
-    .modal-err { color: var(--red); font-size: .8rem; min-height: 18px; margin-bottom: 4px; }
-    .modal-foot { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-    .mbtn { padding: 10px 20px; border-radius: 8px; border: none; font-size: .85rem; font-weight: 600; cursor: pointer; transition: opacity .15s; display: flex; align-items: center; gap: 6px; }
-    .mbtn:hover { opacity: .85; }
-    .mbtn-cancel { background: #eef0f4; color: #555; }
-    .mbtn-green  { background: var(--green);  color: white; }
-    .mbtn-blue   { background: var(--blue);   color: white; }
-
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.35); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      .summary-row { grid-template-columns: 1fr 1fr; }
-      .charts-grid  { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 640px) {
-      .site-header { padding: 0 16px; flex-wrap: wrap; }
-      #page-dashboard, #page-chart { padding: 16px; }
-      .summary-row { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .header-actions .status-pill { display: none; }
-      table { font-size: .8rem; }
-      td, thead th { padding: 10px 12px; }
-    }
+    @media (max-width:900px) { .summary-row { grid-template-columns:1fr 1fr; } .charts-grid { grid-template-columns:1fr; } }
+    @media (max-width:640px) { .site-header { padding:0 16px; flex-wrap:wrap; } #page-dashboard,#page-chart { padding:16px; } .summary-row { grid-template-columns:1fr 1fr; gap:10px; } table { font-size:.8rem; } td,thead th { padding:10px 12px; } }
   </style>
 </head>
 <body>
 
-<!-- ══ LOGIN SCREEN ══ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-emblem">✈️</div>
     <h1>CAP Springfield Squadron</h1>
     <p>Wreaths Across America — Cadet Fundraising Tracker</p>
     <div class="login-divider">Enter your access password</div>
-    <form onsubmit="submitLogin();return false;">
+    <form onsubmit="submitLogin(); return false;">
+      <label for="login-pass" style="display:none">Password</label>
       <div class="login-field">
         <span class="field-icon">🔒</span>
         <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
       </div>
       <button class="login-btn" id="loginBtn" type="submit">🔓 Sign In</button>
     </form>
-    <div class="login-err" id="loginErr">Incorrect password. Please try again.</div>
+    <div class="login-err" id="loginErr"></div>
     <div class="login-footer">Contact your squadron administrator if you need access.<br><span>Civil Air Patrol · Springfield Composite Squadron</span></div>
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- APP -->
 <div id="app">
-
   <header class="site-header">
     <div class="header-brand">
       <div class="header-icon">✈️</div>
@@ -305,7 +202,7 @@
       <span class="status-pill" id="statusPill">Loading…</span>
       <button class="hbtn hbtn-outline admin-only" id="refreshBtn" onclick="refreshData()">🔄 Refresh</button>
       <button class="hbtn hbtn-gold admin-only" onclick="openAddModal()">➕ Add Cadet</button>
-      <button class="hbtn hbtn-ghost" onclick="logout()" title="Sign out">↩ Sign Out</button>
+      <button class="hbtn hbtn-ghost" onclick="logout()">↩ Sign Out</button>
     </div>
   </header>
 
@@ -319,11 +216,11 @@
     <div class="section-header">
       <div>
         <div class="section-title">Cadet Progress</div>
-        <div class="section-sub">Live data pulled from Wreaths Across America · Admins can click Refresh to update</div>
+        <div class="section-sub">Live data from Wreaths Across America · Admins click Refresh to update</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <label style="font-size:.78rem;color:var(--muted);font-weight:600">Sort by:</label>
-        <select id="sortSelect" onchange="render()" style="padding:6px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:.82rem;outline:none;cursor:pointer;background:white;color:var(--text)">
+        <label for="sortSelect" style="font-size:.78rem;color:var(--muted);font-weight:600">Sort by:</label>
+        <select id="sortSelect" onchange="renderTable()" style="padding:6px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:.82rem;outline:none;cursor:pointer;background:white;color:var(--text)">
           <option value="rank">% of Goal (Best First)</option>
           <option value="sold">Wreaths Sold</option>
           <option value="name">Name (A–Z)</option>
@@ -340,9 +237,7 @@
             <th id="actions-header">Actions</th>
           </tr>
         </thead>
-        <tbody id="cadetTableBody">
-          <tr class="empty-row"><td colspan="8">Loading cadet data…</td></tr>
-        </tbody>
+        <tbody id="cadetTableBody"><tr class="empty-row"><td colspan="8">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -361,28 +256,29 @@
       <canvas id="accumChart" height="80"></canvas>
     </div>
   </div>
+</div>
 
-</div><!-- /app -->
-
-<!-- ══ ADD MODAL ══ -->
+<!-- ADD MODAL -->
 <div class="overlay" id="addModal" style="display:none">
   <div class="modal">
     <div class="modal-head"><h2>➕ Add Cadet</h2><button class="modal-close" onclick="closeAddModal()">✕</button></div>
-    <div class="fgroup"><label>Cadet Name</label><input id="add-name" type="text" placeholder="e.g. Cadet Jane Smith"/></div>
     <div class="fgroup">
-      <label>WAA Profile URL</label>
+      <label for="add-name">Cadet Name</label>
+      <input id="add-name" type="text" placeholder="e.g. Cadet Jane Smith"/>
+    </div>
+    <div class="fgroup">
+      <label for="add-url">WAA Profile URL</label>
       <input id="add-url" type="url" placeholder="https://wreathsacrossamerica.org/pages/XXXXXX/Overview"/>
       <div class="fhint">Each cadet has a unique 6-digit page ID in their WAA URL.</div>
     </div>
     <div class="fgroup">
-      <label>Personal Wreath Goal</label>
+      <label for="add-goal">Personal Wreath Goal</label>
       <input id="add-goal" type="number" placeholder="e.g. 50" min="1"/>
-      <div class="fhint">Number of wreaths this cadet is personally aiming to sell.</div>
     </div>
     <div class="fgroup">
-      <label>Wreaths Sold <span style="font-weight:400;color:var(--muted)">(current count)</span></label>
+      <label for="add-sold">Wreaths Sold (current count)</label>
       <input id="add-sold" type="number" placeholder="e.g. 12" min="0"/>
-      <div class="fhint">Check the cadet's WAA page and enter the number shown under "Wreaths so Far". WAA's live count is JavaScript-rendered and cannot be scraped automatically.</div>
+      <div class="fhint">Check the cadet's WAA page and enter the number shown under "Wreaths so Far".</div>
     </div>
     <div class="modal-err" id="addErr"></div>
     <div class="modal-foot">
@@ -392,20 +288,23 @@
   </div>
 </div>
 
-<!-- ══ EDIT MODAL ══ -->
+<!-- EDIT MODAL -->
 <div class="overlay" id="editModal" style="display:none">
   <div class="modal">
     <div class="modal-head"><h2>✏️ Edit Cadet</h2><button class="modal-close" onclick="closeEditModal()">✕</button></div>
     <input type="hidden" id="edit-id"/>
-    <div class="fgroup"><label>Cadet Name</label><input id="edit-name" type="text"/></div>
     <div class="fgroup">
-      <label>Personal Wreath Goal</label>
+      <label for="edit-name">Cadet Name</label>
+      <input id="edit-name" type="text"/>
+    </div>
+    <div class="fgroup">
+      <label for="edit-goal">Personal Wreath Goal</label>
       <input id="edit-goal" type="number" min="0"/>
     </div>
     <div class="fgroup">
-      <label>Wreaths Sold <span style="font-weight:400;color:var(--muted)">(current count)</span></label>
+      <label for="edit-sold">Wreaths Sold (current count)</label>
       <input id="edit-sold" type="number" min="0"/>
-      <div class="fhint">Update this from the cadet's WAA page — the live count cannot be scraped automatically.</div>
+      <div class="fhint">Update this from the cadet's WAA page.</div>
     </div>
     <div class="modal-err" id="editErr"></div>
     <div class="modal-foot">
@@ -416,370 +315,322 @@
 </div>
 
 <script>
-  const API = "/api/proxy";
-  let cadets = [], userRole = null;
-  let barChart = null, doughnutChart = null, gapChart = null, accumChart = null;
+const API = "/api/proxy";
+let cadets = [], userRole = null;
+let barChart = null, doughnutChart = null, gapChart = null, accumChart = null;
 
-  // ── AUTH ──
-  async function submitLogin() {
-    const pass  = document.getElementById("login-pass").value;
-    const btn   = document.getElementById("loginBtn");
-    const errEl = document.getElementById("loginErr");
-    if (!pass) { errEl.textContent = "Please enter a password."; errEl.style.display = "block"; return; }
+// ── AUTH ──
+function submitLogin() {
+  const pass  = document.getElementById("login-pass").value.trim();
+  const btn   = document.getElementById("loginBtn");
+  const errEl = document.getElementById("loginErr");
+  if (!pass) { errEl.textContent = "Please enter a password."; errEl.style.display = "block"; return; }
 
-    btn.innerHTML = `<span class="spinner"></span> Signing in…`;
-    btn.disabled  = true;
-    errEl.style.display = "none";
+  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+  btn.disabled  = true;
+  errEl.style.display = "none";
 
-    try {
-      const r = await fetch(`/api/proxy?action=login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pass })
-      });
-      let d;
-      try { d = await r.json(); } catch { throw new Error(`Server returned non-JSON (HTTP ${r.status})`); }
-      if (!r.ok || d.error) throw new Error(d?.error || `HTTP ${r.status}`);
-
-      userRole = d.role;
-      sessionStorage.setItem("waa_role", d.role);
-      console.log("Login success, role:", d.role, "calling showApp...");
-      showApp();
-    } catch(e) {
-      errEl.textContent = "Error: " + (e.message || "Unknown error");
-      errEl.style.display = "block";
-      btn.innerHTML = "🔓 Sign In";
-      btn.disabled  = false;
-      document.getElementById("login-pass").value = "";
-    }
-  }
-
-  function logout() {
-    sessionStorage.removeItem("waa_role");
-    userRole = null;
-    document.getElementById("app").style.display          = "none";
-    document.getElementById("login-screen").style.display = "flex";
+  fetch(API + "?action=login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: pass })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.error) throw new Error(d.error);
+    userRole = d.role;
+    sessionStorage.setItem("waa_role", d.role);
+    showApp();
+  })
+  .catch(function(e) {
+    errEl.textContent = e.message || "Incorrect password. Please try again.";
+    errEl.style.display = "block";
+    btn.innerHTML = "🔓 Sign In";
+    btn.disabled  = false;
     document.getElementById("login-pass").value = "";
-    document.getElementById("loginErr").style.display = "none";
-    document.getElementById("loginBtn").innerHTML = "🔓 Sign In";
-    document.getElementById("loginBtn").disabled  = false;
+  });
+}
+
+function logout() {
+  sessionStorage.removeItem("waa_role");
+  userRole = null;
+  document.getElementById("app").style.display          = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("login-pass").value = "";
+  document.getElementById("loginErr").style.display = "none";
+  document.getElementById("loginBtn").innerHTML = "🔓 Sign In";
+  document.getElementById("loginBtn").disabled  = false;
+}
+
+function showApp() {
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display          = "block";
+  var pill = document.getElementById("rolePill");
+  pill.textContent = userRole === "admin" ? "⭐ Admin" : "👁 Read Only";
+  pill.className   = "role-pill " + userRole;
+  document.querySelectorAll(".admin-only").forEach(function(el) {
+    el.style.display = userRole === "admin" ? "" : "none";
+  });
+  var ah = document.getElementById("actions-header");
+  if (ah) ah.style.display = userRole === "admin" ? "" : "none";
+  loadCadets();
+}
+
+// On page load check session
+(function() {
+  var saved = sessionStorage.getItem("waa_role");
+  if (saved === "admin" || saved === "readonly") {
+    userRole = saved;
+    showApp();
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("app").style.display = "none";
   }
+})();
 
-  function showApp() {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app").style.display          = "block";
+// ── PAGE NAV ──
+function showPage(p) {
+  document.getElementById("page-dashboard").style.display = p === "dashboard" ? "" : "none";
+  document.getElementById("page-chart").style.display     = p === "chart"     ? "" : "none";
+  document.getElementById("nav-dash").classList.toggle("active",  p === "dashboard");
+  document.getElementById("nav-chart").classList.toggle("active", p === "chart");
+  if (p === "chart") renderCharts();
+}
 
-    // Role pill
-    const pill = document.getElementById("rolePill");
-    if (pill) {
-      pill.textContent = userRole === "admin" ? "⭐ Admin" : "👁 Read Only";
-      pill.className   = `role-pill ${userRole}`;
-    }
+// ── DATA ──
+function loadCadets() {
+  setStatus("Loading…");
+  fetch(API + "?action=list")
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    cadets = d.cadets || [];
+    render();
+    setStatus("Updated " + ts());
+  })
+  .catch(function() { setStatus("⚠️ Load failed"); });
+}
 
-    // Show/hide admin controls
-    document.querySelectorAll(".admin-only").forEach(el => {
-      el.style.display = userRole === "admin" ? "" : "none";
-    });
+function refreshData() {
+  var btn = document.getElementById("refreshBtn");
+  btn.innerHTML = '<span class="spinner"></span> Refreshing…';
+  btn.disabled = true;
+  fetch(API + "?action=refresh", { method: "POST" })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    cadets = d.cadets || [];
+    render();
+    if (document.getElementById("page-chart").style.display !== "none") renderCharts();
+    setStatus("Refreshed " + ts());
+  })
+  .catch(function() { setStatus("⚠️ Refresh failed"); })
+  .finally(function() { btn.innerHTML = "🔄 Refresh"; btn.disabled = false; });
+}
 
-    // Hide actions column header for read-only
-    const actHeader = document.getElementById("actions-header");
-    if (actHeader) actHeader.style.display = userRole === "admin" ? "" : "none";
+// ── RENDER ──
+function render() { renderKPIs(); renderTable(); }
 
-    loadCadets();
+function renderKPIs() {
+  var totalSold = cadets.reduce(function(s,c) { return s+(c.sold||0); }, 0);
+  var totalGoal = cadets.reduce(function(s,c) { return s+(c.goal||0); }, 0);
+  var pct = totalGoal > 0 ? Math.round((totalSold/totalGoal)*100) : 0;
+  document.getElementById("kpi-cadets").textContent = cadets.length;
+  document.getElementById("kpi-sold").textContent   = totalSold.toLocaleString();
+  document.getElementById("kpi-goal").textContent   = totalGoal.toLocaleString();
+  document.getElementById("kpi-pct").textContent    = pct + "%";
+}
+
+function getSortedCadets() {
+  var sort = document.getElementById("sortSelect") ? document.getElementById("sortSelect").value : "rank";
+  var copy = cadets.slice();
+  if (sort === "rank")  return copy.sort(function(a,b) { var pa=a.goal>0?(a.sold||0)/a.goal:0; var pb=b.goal>0?(b.sold||0)/b.goal:0; return pb-pa; });
+  if (sort === "sold")  return copy.sort(function(a,b) { return (b.sold||0)-(a.sold||0); });
+  if (sort === "name")  return copy.sort(function(a,b) { return a.name.localeCompare(b.name); });
+  if (sort === "goal")  return copy.sort(function(a,b) { return (b.goal||0)-(a.goal||0); });
+  return copy;
+}
+
+function getMedals() {
+  var ranked = cadets.slice()
+    .map(function(c) { return { id:c.id, pct:c.goal>0?(c.sold||0)/c.goal:0 }; })
+    .sort(function(a,b) { return b.pct-a.pct; });
+  var medals = {}, icons = ["🥇","🥈","🥉"];
+  ranked.slice(0,3).forEach(function(c,i) { if(c.pct>0) medals[c.id]=icons[i]; });
+  return medals;
+}
+
+function renderTable() {
+  var tbody   = document.getElementById("cadetTableBody");
+  var isAdmin = userRole === "admin";
+  var sorted  = getSortedCadets();
+  var medals  = getMedals();
+  if (!sorted.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="' + (isAdmin?8:7) + '">No cadets yet' + (isAdmin?' — click <strong>Add Cadet</strong> to get started':'') + '.</td></tr>';
+    return;
   }
+  var rows = sorted.map(function(c, i) {
+    var sold = c.sold||0, goal = c.goal||0;
+    var pct  = goal>0 ? Math.min(100,Math.round((sold/goal)*100)) : 0;
+    var cls  = pct>=100?"high":pct>=60?"mid":"low";
+    var badge = !goal
+      ? '<span class="badge badge-gray">No Goal</span>'
+      : pct>=100 ? '<span class="badge badge-green">✅ Met!</span>'
+      : pct>=75  ? '<span class="badge badge-yellow">🔥 Close</span>'
+      :             '<span class="badge badge-red">🎯 In Progress</span>';
+    var upd    = c.lastUpdated ? new Date(c.lastUpdated).toLocaleDateString() : "—";
+    var medal  = medals[c.id] ? '<span style="font-size:1.1rem;margin-right:4px">'+medals[c.id]+'</span>' : "";
+    var actCell = isAdmin
+      ? '<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal(\''+c.id+'\')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet(\''+c.id+'\',\''+c.name.replace(/'/g,"\\'")+ '\')">✕</button></div></td>'
+      : "";
+    return '<tr>'
+      + '<td style="color:var(--muted);font-weight:700">'+(i+1)+'</td>'
+      + '<td class="td-name">'+medal+c.name+'<a class="td-link" href="'+c.url+'" target="_blank">WAA Page ↗</a></td>'
+      + '<td><span class="td-num">'+sold+'</span></td>'
+      + '<td><span class="td-goal">'+goal+'</span></td>'
+      + '<td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill '+cls+'" style="width:'+pct+'%"></div></div><span class="bar-pct">'+pct+'%</span></div></td>'
+      + '<td>'+badge+'</td>'
+      + '<td style="color:var(--muted);font-size:.78rem">'+upd+'</td>'
+      + actCell
+      + '</tr>';
+  });
+  tbody.innerHTML = rows.join("");
+}
 
-  // Check for existing session on page load
-  window.addEventListener("DOMContentLoaded", () => {
-    const saved = sessionStorage.getItem("waa_role");
-    if (saved === "admin" || saved === "readonly") {
-      userRole = saved;
-      showApp();
-    } else {
-      document.getElementById("login-screen").style.display = "flex";
-      document.getElementById("app").style.display = "none";
-    }
+// ── CHARTS ──
+function renderCharts() {
+  var names = cadets.map(function(c) { return c.name.replace(/^Cadet\s+/i,""); });
+  var goals = cadets.map(function(c) { return c.goal||0; });
+  var sold  = cadets.map(function(c) { return c.sold||0; });
+  var totalSold = sold.reduce(function(a,b){return a+b;},0);
+  var totalGoal = goals.reduce(function(a,b){return a+b;},0);
+  var remaining = Math.max(0, totalGoal-totalSold);
+
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById("barChart").getContext("2d"), {
+    type:"bar",
+    data:{ labels:names, datasets:[
+      { label:"Personal Goal", data:goals, backgroundColor:"rgba(21,101,192,.18)", borderColor:"rgba(21,101,192,.7)", borderWidth:2, borderRadius:6 },
+      { label:"Wreaths Sold",  data:sold,
+        backgroundColor:sold.map(function(s,i){return s>=goals[i]?"rgba(46,125,50,.75)":"rgba(198,40,40,.65)";}),
+        borderColor:    sold.map(function(s,i){return s>=goals[i]?"rgba(46,125,50,1)":"rgba(198,40,40,1)";}),
+        borderWidth:2, borderRadius:6 }
+    ]},
+    options:{ responsive:true, plugins:{ legend:{position:"top"} }, scales:{ y:{ beginAtZero:true, title:{display:true,text:"Wreaths"} } } }
   });
 
-  // ── PAGE NAV ──
-  function showPage(p) {
-    document.getElementById("page-dashboard").style.display = p === "dashboard" ? "" : "none";
-    document.getElementById("page-chart").style.display     = p === "chart"     ? "" : "none";
-    document.getElementById("nav-dash").classList.toggle("active",  p === "dashboard");
-    document.getElementById("nav-chart").classList.toggle("active", p === "chart");
-    if (p === "chart") renderCharts();
-  }
+  if (doughnutChart) doughnutChart.destroy();
+  doughnutChart = new Chart(document.getElementById("doughnutChart").getContext("2d"), {
+    type:"doughnut",
+    data:{ labels:["Sold","Remaining"], datasets:[{ data:[totalSold,remaining], backgroundColor:["#43a047","#e0e7ef"], borderColor:["#2e7d32","#c8d3e0"], borderWidth:2 }]},
+    options:{ cutout:"70%", plugins:{ legend:{position:"bottom"} } },
+    plugins:[{ id:"centerText", beforeDraw:function(chart) {
+      var ctx=chart.ctx, ca=chart.chartArea;
+      ctx.save();
+      var pct=totalGoal>0?Math.round((totalSold/totalGoal)*100):0;
+      ctx.font="bold 28px Segoe UI"; ctx.fillStyle="#1565c0";
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(pct+"%", ca.left+ca.width/2, ca.top+ca.height/2);
+      ctx.restore();
+    }}]
+  });
 
-  // ── LOAD ──
-  async function loadCadets() {
-    setStatus("Loading…");
-    try {
-      const r = await fetch(`${API}?action=list`);
-      const d = await r.json();
-      cadets = d.cadets || [];
-      render();
-      setStatus(`Updated ${ts()}`);
-    } catch { setStatus("⚠️ Load failed"); }
-  }
+  var gaps = cadets.map(function(c){return Math.max(0,(c.goal||0)-(c.sold||0));});
+  if (gapChart) gapChart.destroy();
+  gapChart = new Chart(document.getElementById("gapChart").getContext("2d"), {
+    type:"bar",
+    data:{ labels:names, datasets:[{ label:"Wreaths Still Needed", data:gaps,
+      backgroundColor:gaps.map(function(g){return g===0?"rgba(46,125,50,.6)":"rgba(198,40,40,.55)";}),
+      borderColor:    gaps.map(function(g){return g===0?"rgba(46,125,50,1)":"rgba(198,40,40,1)";}),
+      borderWidth:2, borderRadius:6 }]},
+    options:{ indexAxis:"y", responsive:true, plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true,title:{display:true,text:"Wreaths"}} } }
+  });
 
-  // ── REFRESH (admin only) ──
-  async function refreshData() {
-    if (userRole !== "admin") return;
-    const btn = document.getElementById("refreshBtn");
-    btn.innerHTML = `<span class="spinner"></span> Refreshing…`; btn.disabled = true;
-    try {
-      const r = await fetch(`${API}?action=refresh`, { method: "POST" });
-      const d = await r.json();
-      cadets = d.cadets || [];
-      render();
-      if (document.getElementById("page-chart").style.display !== "none") renderCharts();
-      setStatus(`Refreshed ${ts()}`);
-    } catch { setStatus("⚠️ Refresh failed"); }
-    btn.innerHTML = "🔄 Refresh"; btn.disabled = false;
-  }
+  var lbSorted = cadets.slice()
+    .map(function(c){return {name:c.name.replace(/^Cadet\s+/i,""),pct:c.goal>0?Math.min(100,Math.round((c.sold/c.goal)*100)):0};})
+    .sort(function(a,b){return b.pct-a.pct;});
+  var rankCls=["gold","silver","bronze"];
+  document.getElementById("leaderboard").innerHTML = lbSorted.map(function(c,i){
+    return '<li class="lb-row"><div class="lb-rank '+(rankCls[i]||'')+'">'+( i+1)+'</div><span class="lb-name">'+c.name+'</span><span class="lb-pct">'+c.pct+'%</span></li>';
+  }).join("");
 
-  function getSortedCadets() {
-    const sort = document.getElementById("sortSelect")?.value || "rank";
-    const copy = [...cadets];
-    if (sort === "rank")  return copy.sort((a,b) => {
-      const pa = a.goal>0 ? (a.sold||0)/a.goal : 0;
-      const pb = b.goal>0 ? (b.sold||0)/b.goal : 0;
-      return pb - pa;
-    });
-    if (sort === "sold")  return copy.sort((a,b) => (b.sold||0)-(a.sold||0));
-    if (sort === "name")  return copy.sort((a,b) => a.name.localeCompare(b.name));
-    if (sort === "goal")  return copy.sort((a,b) => (b.goal||0)-(a.goal||0));
-    return copy;
-  }
+  var accumSorted = cadets.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+  var accumLabels = accumSorted.map(function(c){return c.name.replace(/^Cadet\s+/i,"");});
+  var runSold=0, runGoal=0;
+  var accumSoldData = accumSorted.map(function(c){runSold+=(c.sold||0);return runSold;});
+  var accumGoalData = accumSorted.map(function(c){runGoal+=(c.goal||0);return runGoal;});
+  if (accumChart) accumChart.destroy();
+  accumChart = new Chart(document.getElementById("accumChart").getContext("2d"), {
+    type:"line",
+    data:{ labels:accumLabels, datasets:[
+      { label:"Cumulative Goal", data:accumGoalData, borderColor:"rgba(21,101,192,0.7)", backgroundColor:"rgba(21,101,192,0.08)", borderWidth:2, borderDash:[6,4], pointRadius:4, fill:false, tension:0.3 },
+      { label:"Cumulative Sold", data:accumSoldData, borderColor:"rgba(46,125,50,1)", backgroundColor:"rgba(46,125,50,0.12)", borderWidth:3, pointRadius:5, pointBackgroundColor:"rgba(46,125,50,1)", fill:true, tension:0.3 }
+    ]},
+    options:{ responsive:true, plugins:{legend:{position:"top"}}, scales:{ y:{beginAtZero:true,title:{display:true,text:"Total Wreaths"}}, x:{title:{display:true,text:"Cadets (cumulative)"}} } }
+  });
+}
 
-  // Medal emoji for top 3 by % of goal
-  function getMedals() {
-    const ranked = [...cadets]
-      .map(c => ({ id: c.id, pct: c.goal>0 ? (c.sold||0)/c.goal : 0 }))
-      .sort((a,b) => b.pct - a.pct);
-    const medals = {};
-    const icons = ["🥇","🥈","🥉"];
-    ranked.slice(0,3).forEach((c,i) => { if(c.pct > 0) medals[c.id] = icons[i]; });
-    return medals;
-  }
+// ── ADD ──
+function openAddModal()  { if(userRole!=="admin")return; document.getElementById("addModal").style.display="flex"; document.getElementById("addErr").textContent=""; ["add-name","add-url","add-goal","add-sold"].forEach(function(id){document.getElementById(id).value="";}); }
+function closeAddModal() { document.getElementById("addModal").style.display="none"; }
 
-  // ── RENDER ──
-  function render() { renderKPIs(); renderTable(); }
-    const totalSold = cadets.reduce((s,c) => s+(c.sold||0), 0);
-    const totalGoal = cadets.reduce((s,c) => s+(c.goal||0), 0);
-    const pct = totalGoal > 0 ? Math.round((totalSold/totalGoal)*100) : 0;
-    document.getElementById("kpi-cadets").textContent = cadets.length;
-    document.getElementById("kpi-sold").textContent   = totalSold.toLocaleString();
-    document.getElementById("kpi-goal").textContent   = totalGoal.toLocaleString();
-    document.getElementById("kpi-pct").textContent    = pct + "%";
-  }
+function submitAdd() {
+  var name = document.getElementById("add-name").value.trim();
+  var url  = document.getElementById("add-url").value.trim();
+  var goal = document.getElementById("add-goal").value.trim();
+  var sold = document.getElementById("add-sold").value.trim();
+  var err  = document.getElementById("addErr");
+  if (!name) { err.textContent="Please enter the cadet's name."; return; }
+  if (!url||!url.startsWith("http")) { err.textContent="Please enter a valid WAA URL."; return; }
+  if (!goal||parseInt(goal)<1) { err.textContent="Please enter a personal wreath goal."; return; }
+  var btn = document.getElementById("addBtn");
+  btn.innerHTML='<span class="spinner"></span> Saving…'; btn.disabled=true; err.textContent="";
+  fetch(API+"?action=add",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,url:url,goal:parseInt(goal),manualSold:sold===""?0:parseInt(sold)})})
+  .then(function(r){return r.json();})
+  .then(function(d){if(d.error)throw new Error(d.error); cadets.push(d.cadet); render(); closeAddModal(); setStatus("Added "+name+" · "+ts());})
+  .catch(function(e){err.textContent="Error: "+e.message;})
+  .finally(function(){btn.innerHTML="➕ Add Cadet";btn.disabled=false;});
+}
 
-  function renderTable() {
-    const tbody = document.getElementById("cadetTableBody");
-    const isAdmin = userRole === "admin";
-    const sorted  = getSortedCadets();
-    const medals  = getMedals();
+// ── EDIT ──
+function openEditModal(id) {
+  if(userRole!=="admin")return;
+  var c=cadets.find(function(c){return c.id===id;});
+  if(!c)return;
+  document.getElementById("edit-id").value=c.id;
+  document.getElementById("edit-name").value=c.name;
+  document.getElementById("edit-goal").value=c.goal||0;
+  document.getElementById("edit-sold").value=c.sold||0;
+  document.getElementById("editErr").textContent="";
+  document.getElementById("editModal").style.display="flex";
+}
+function closeEditModal() { document.getElementById("editModal").style.display="none"; }
 
-    if (!sorted.length) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="${isAdmin?8:7}">No cadets yet${isAdmin?" — click <strong>Add Cadet</strong> to get started":""}.`;
-      return;
-    }
-    tbody.innerHTML = sorted.map((c,i) => {
-      const sold = c.sold||0, goal = c.goal||0;
-      const pct  = goal>0 ? Math.min(100,Math.round((sold/goal)*100)) : 0;
-      const cls  = pct>=100?"high":pct>=60?"mid":"low";
-      const badge = !goal
-        ? `<span class="badge badge-gray">No Goal</span>`
-        : pct>=100 ? `<span class="badge badge-green">✅ Met!</span>`
-        : pct>=75  ? `<span class="badge badge-yellow">🔥 Close</span>`
-        :             `<span class="badge badge-red">🎯 In Progress</span>`;
-      const upd = c.lastUpdated ? new Date(c.lastUpdated).toLocaleDateString() : "—";
-      const medal = medals[c.id] ? `<span style="font-size:1.1rem;margin-right:4px">${medals[c.id]}</span>` : "";
-      const actCell = isAdmin ? `
-        <td><div class="td-actions">
-          <button class="act-btn act-edit" onclick="openEditModal('${c.id}')">✏️ Edit</button>
-          <button class="act-btn act-del"  onclick="deleteCadet('${c.id}','${c.name}')">✕</button>
-        </div></td>` : "";
-      return `
-        <tr>
-          <td style="color:var(--muted);font-weight:700">${i+1}</td>
-          <td class="td-name">${medal}${c.name}<a class="td-link" href="${c.url}" target="_blank">WAA Page ↗</a></td>
-          <td><span class="td-num">${sold}</span></td>
-          <td><span class="td-goal">${goal}</span></td>
-          <td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
-              <span class="bar-pct">${pct}%</span></div></td>
-          <td>${badge}</td>
-          <td style="color:var(--muted);font-size:.78rem">${upd}</td>
-          ${actCell}
-        </tr>`;
-    }).join("");
-  }
+function submitEdit() {
+  var id   = document.getElementById("edit-id").value;
+  var name = document.getElementById("edit-name").value.trim();
+  var goal = document.getElementById("edit-goal").value.trim();
+  var sold = document.getElementById("edit-sold").value.trim();
+  var err  = document.getElementById("editErr");
+  if(!name){err.textContent="Name cannot be empty.";return;}
+  if(goal===""||parseInt(goal)<0){err.textContent="Please enter a valid goal.";return;}
+  var btn=document.getElementById("editBtn");
+  btn.innerHTML='<span class="spinner"></span> Saving…'; btn.disabled=true; err.textContent="";
+  fetch(API+"?action=edit&id="+id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,goal:parseInt(goal),manualSold:sold===""?undefined:parseInt(sold)})})
+  .then(function(r){return r.json();})
+  .then(function(d){if(d.error)throw new Error(d.error); var idx=cadets.findIndex(function(c){return c.id===id;}); if(idx!==-1)cadets[idx]=d.cadet; render(); closeEditModal(); setStatus("Updated "+name+" · "+ts());})
+  .catch(function(e){err.textContent="Error: "+e.message;})
+  .finally(function(){btn.innerHTML="💾 Save Changes";btn.disabled=false;});
+}
 
-  // ── CHARTS ──
-  function renderCharts() {
-    const names = cadets.map(c => c.name.replace(/^Cadet\s+/i,""));
-    const goals = cadets.map(c => c.goal||0);
-    const sold  = cadets.map(c => c.sold||0);
-    const totalSold = sold.reduce((a,b)=>a+b,0);
-    const totalGoal = goals.reduce((a,b)=>a+b,0);
-    const remaining = Math.max(0, totalGoal-totalSold);
+// ── DELETE ──
+function deleteCadet(id, name) {
+  if(userRole!=="admin")return;
+  if(!confirm("Remove "+name+" from the tracker?"))return;
+  fetch(API+"?action=delete&id="+id,{method:"DELETE"})
+  .then(function(){cadets=cadets.filter(function(c){return c.id!==id;}); render(); setStatus("Removed "+name+" · "+ts());});
+}
 
-    if (barChart) barChart.destroy();
-    barChart = new Chart(document.getElementById("barChart").getContext("2d"), {
-      type: "bar",
-      data: { labels: names, datasets: [
-        { label:"Personal Goal", data:goals, backgroundColor:"rgba(21,101,192,.18)", borderColor:"rgba(21,101,192,.7)", borderWidth:2, borderRadius:6 },
-        { label:"Wreaths Sold",  data:sold,
-          backgroundColor: sold.map((s,i)=>s>=goals[i]?"rgba(46,125,50,.75)":"rgba(198,40,40,.65)"),
-          borderColor:     sold.map((s,i)=>s>=goals[i]?"rgba(46,125,50,1)":"rgba(198,40,40,1)"),
-          borderWidth:2, borderRadius:6 }
-      ]},
-      options: { responsive:true, plugins:{ legend:{position:"top"}, tooltip:{ callbacks:{ afterLabel: ctx => {
-        if(ctx.datasetIndex===1){ const g=goals[ctx.dataIndex],s=sold[ctx.dataIndex]; return g>0?`${Math.round((s/g)*100)}% of goal`:""; }
-      }}}}, scales:{ y:{ beginAtZero:true, title:{display:true,text:"Wreaths"} }}}
-    });
-
-    if (doughnutChart) doughnutChart.destroy();
-    doughnutChart = new Chart(document.getElementById("doughnutChart").getContext("2d"), {
-      type:"doughnut",
-      data:{ labels:["Sold","Remaining"], datasets:[{ data:[totalSold,remaining], backgroundColor:["#43a047","#e0e7ef"], borderColor:["#2e7d32","#c8d3e0"], borderWidth:2 }]},
-      options:{ cutout:"70%", plugins:{ legend:{position:"bottom"} }},
-      plugins:[{ id:"centerText", beforeDraw(chart){
-        const {ctx,chartArea:{width,height,left,top}}=chart;
-        ctx.save();
-        const pct=totalGoal>0?Math.round((totalSold/totalGoal)*100):0;
-        ctx.font="bold 28px Segoe UI"; ctx.fillStyle="#1565c0";
-        ctx.textAlign="center"; ctx.textBaseline="middle";
-        ctx.fillText(pct+"%",left+width/2,top+height/2); ctx.restore();
-      }}]
-    });
-
-    const gaps = cadets.map(c => Math.max(0,(c.goal||0)-(c.sold||0)));
-    if (gapChart) gapChart.destroy();
-    gapChart = new Chart(document.getElementById("gapChart").getContext("2d"), {
-      type:"bar",
-      data:{ labels:names, datasets:[{ label:"Wreaths Still Needed", data:gaps,
-        backgroundColor:gaps.map(g=>g===0?"rgba(46,125,50,.6)":"rgba(198,40,40,.55)"),
-        borderColor:    gaps.map(g=>g===0?"rgba(46,125,50,1)":"rgba(198,40,40,1)"),
-        borderWidth:2, borderRadius:6 }]},
-      options:{ indexAxis:"y", responsive:true, plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true,title:{display:true,text:"Wreaths"}} }}
-    });
-
-    // Accumulation chart — cadet totals only, sorted by name
-    const accumSorted = [...cadets].sort((a,b) => a.name.localeCompare(b.name));
-    const accumLabels = accumSorted.map(c => c.name.replace(/^Cadet\s+/i,""));
-    let runSold = 0, runGoal = 0;
-    const accumSoldData = accumSorted.map(c => { runSold += (c.sold||0); return runSold; });
-    const accumGoalData = accumSorted.map(c => { runGoal += (c.goal||0); return runGoal; });
-
-    if (accumChart) accumChart.destroy();
-    accumChart = new Chart(document.getElementById("accumChart").getContext("2d"), {
-      type: "line",
-      data: {
-        labels: accumLabels,
-        datasets: [
-          {
-            label: "Cumulative Goal",
-            data: accumGoalData,
-            borderColor: "rgba(21,101,192,0.7)",
-            backgroundColor: "rgba(21,101,192,0.08)",
-            borderWidth: 2,
-            borderDash: [6,4],
-            pointRadius: 4,
-            fill: false,
-            tension: 0.3
-          },
-          {
-            label: "Cumulative Sold",
-            data: accumSoldData,
-            borderColor: "rgba(46,125,50,1)",
-            backgroundColor: "rgba(46,125,50,0.12)",
-            borderWidth: 3,
-            pointRadius: 5,
-            pointBackgroundColor: "rgba(46,125,50,1)",
-            fill: true,
-            tension: 0.3
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: "top" },
-          tooltip: {
-            callbacks: {
-              afterBody: (items) => {
-                const idx = items[0]?.dataIndex;
-                if (idx === undefined) return "";
-                const g = accumGoalData[idx], s = accumSoldData[idx];
-                return g > 0 ? `Progress: ${Math.round((s/g)*100)}% of cumulative goal` : "";
-              }
-            }
-          }
-        },
-        scales: {
-          y: { beginAtZero: true, title: { display: true, text: "Total Wreaths" } },
-          x: { title: { display: true, text: "Cadets (cumulative)" } }
-        }
-      }
-    });
-  }
-
-  // ── ADD ──
-  function openAddModal()  { if(userRole!=="admin")return; document.getElementById("addModal").style.display="flex"; document.getElementById("addErr").textContent=""; ["add-name","add-url","add-goal","add-sold"].forEach(id=>document.getElementById(id).value=""); }
-  function closeAddModal() { document.getElementById("addModal").style.display="none"; }
-
-  async function submitAdd() {
-    const name=document.getElementById("add-name").value.trim();
-    const url=document.getElementById("add-url").value.trim();
-    const goal=document.getElementById("add-goal").value.trim();
-    const sold=document.getElementById("add-sold").value.trim();
-    const err=document.getElementById("addErr");
-    if(!name){err.textContent="Please enter the cadet's name.";return;}
-    if(!url||!url.startsWith("http")){err.textContent="Please enter a valid WAA URL.";return;}
-    if(!goal||parseInt(goal)<1){err.textContent="Please enter a personal wreath goal.";return;}
-    const btn=document.getElementById("addBtn");
-    btn.innerHTML=`<span class="spinner"></span> Saving…`;btn.disabled=true;err.textContent="";
-    try {
-      const r=await fetch(`${API}?action=add`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,url,goal:parseInt(goal),manualSold:sold===""?0:parseInt(sold)})});
-      const d=await r.json(); if(d.error)throw new Error(d.error);
-      cadets.push(d.cadet);render();closeAddModal();setStatus(`Added ${name} · ${ts()}`);
-    } catch(e){err.textContent="Error: "+e.message;}
-    btn.innerHTML="➕ Add Cadet";btn.disabled=false;
-  }
-
-  // ── EDIT ──
-  function openEditModal(id) { if(userRole!=="admin")return; const c=cadets.find(c=>c.id===id);if(!c)return; document.getElementById("edit-id").value=c.id; document.getElementById("edit-name").value=c.name; document.getElementById("edit-goal").value=c.goal; document.getElementById("edit-sold").value=c.sold||0; document.getElementById("editErr").textContent=""; document.getElementById("editModal").style.display="flex"; }
-  function closeEditModal() { document.getElementById("editModal").style.display="none"; }
-
-  async function submitEdit() {
-    const id=document.getElementById("edit-id").value;
-    const name=document.getElementById("edit-name").value.trim();
-    const goal=document.getElementById("edit-goal").value.trim();
-    const sold=document.getElementById("edit-sold").value.trim();
-    const err=document.getElementById("editErr");
-    if(!name){err.textContent="Name cannot be empty.";return;}
-    if(goal===""||parseInt(goal)<0){err.textContent="Please enter a valid goal.";return;}
-    const btn=document.getElementById("editBtn");
-    btn.innerHTML=`<span class="spinner"></span> Saving…`;btn.disabled=true;err.textContent="";
-    try {
-      const r=await fetch(`${API}?action=edit&id=${id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,goal:parseInt(goal),manualSold:sold===""?undefined:parseInt(sold)})});
-      const d=await r.json();if(d.error)throw new Error(d.error);
-      const idx=cadets.findIndex(c=>c.id===id);if(idx!==-1)cadets[idx]=d.cadet;
-      render();closeEditModal();setStatus(`Updated ${name} · ${ts()}`);
-    } catch(e){err.textContent="Error: "+e.message;}
-    btn.innerHTML="💾 Save Changes";btn.disabled=false;
-  }
-
-  // ── DELETE ──
-  async function deleteCadet(id,name) {
-    if(userRole!=="admin")return;
-    if(!confirm(`Remove ${name} from the tracker?`))return;
-    await fetch(`${API}?action=delete&id=${id}`,{method:"DELETE"});
-    cadets=cadets.filter(c=>c.id!==id);render();setStatus(`Removed ${name} · ${ts()}`);
-  }
-
-  function setStatus(msg){document.getElementById("statusPill").textContent=msg;}
-  function ts(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+function setStatus(msg){document.getElementById("statusPill").textContent=msg;}
+function ts(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
 </script>
 </body>
 </html>
