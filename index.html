@@ -441,6 +441,7 @@
 
       userRole = d.role;
       sessionStorage.setItem("waa_role", d.role);
+      console.log("Login success, role:", d.role, "calling showApp...");
       showApp();
     } catch(e) {
       errEl.textContent = "Error: " + (e.message || "Unknown error");
@@ -468,14 +469,17 @@
 
     // Role pill
     const pill = document.getElementById("rolePill");
-    pill.textContent = userRole === "admin" ? "⭐ Admin" : "👁 Read Only";
-    pill.className   = `role-pill ${userRole}`;
+    if (pill) {
+      pill.textContent = userRole === "admin" ? "⭐ Admin" : "👁 Read Only";
+      pill.className   = `role-pill ${userRole}`;
+    }
 
     // Show/hide admin controls
     document.querySelectorAll(".admin-only").forEach(el => {
       el.style.display = userRole === "admin" ? "" : "none";
     });
-    // Hide actions column for read-only
+
+    // Hide actions column header for read-only
     const actHeader = document.getElementById("actions-header");
     if (actHeader) actHeader.style.display = userRole === "admin" ? "" : "none";
 
@@ -488,6 +492,9 @@
     if (saved === "admin" || saved === "readonly") {
       userRole = saved;
       showApp();
+    } else {
+      document.getElementById("login-screen").style.display = "flex";
+      document.getElementById("app").style.display = "none";
     }
   });
 
