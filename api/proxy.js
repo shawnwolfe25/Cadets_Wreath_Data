@@ -100,7 +100,6 @@ module.exports = async function handler(req, res) {
     // ── LOGIN ──
     if (req.method === "POST" && action === "login") {
       const { password } = await parseBody(req);
-      if (!password) return res.status(400).json({ error: "Password required" });
       if (password === PASS_ADMIN) return res.status(200).json({ role: "admin" });
       if (password === PASS_READ)  return res.status(200).json({ role: "readonly" });
       return res.status(401).json({ error: "Invalid password" });
