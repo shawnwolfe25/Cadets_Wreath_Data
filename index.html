@@ -319,6 +319,15 @@
         <div class="section-title">Cadet Progress</div>
         <div class="section-sub">Live data pulled from Wreaths Across America · Admins can click Refresh to update</div>
       </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="font-size:.78rem;color:var(--muted);font-weight:600">Sort by:</label>
+        <select id="sortSelect" onchange="render()" style="padding:6px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:.82rem;outline:none;cursor:pointer;background:white;color:var(--text)">
+          <option value="rank">% of Goal (Best First)</option>
+          <option value="sold">Wreaths Sold</option>
+          <option value="name">Name (A–Z)</option>
+          <option value="goal">Personal Goal</option>
+        </select>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
@@ -344,6 +353,10 @@
     <div class="charts-grid" style="grid-template-columns:1fr 1fr">
       <div class="chart-card"><h3>🎗️ Squadron Goal Coverage</h3><canvas id="doughnutChart" height="200"></canvas></div>
       <div class="chart-card"><h3>📉 Wreaths Needed to Reach Goal</h3><canvas id="gapChart" height="200"></canvas></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:28px">
+      <h3>📈 Cumulative Wreaths Sold vs. Combined Goal</h3>
+      <canvas id="accumChart" height="80"></canvas>
     </div>
   </div>
 
@@ -403,7 +416,7 @@
 <script>
   const API = "/api/proxy";
   let cadets = [], userRole = null;
-  let barChart = null, doughnutChart = null, gapChart = null;
+  let barChart = null, doughnutChart = null, gapChart = null, accumChart = null;
 
   // ── AUTH ──
   async function submitLogin() {
@@ -513,10 +526,33 @@
     btn.innerHTML = "🔄 Refresh"; btn.disabled = false;
   }
 
+  function getSortedCadets() {
+    const sort = document.getElementById("sortSelect")?.value || "rank";
+    const copy = [...cadets];
+    if (sort === "rank")  return copy.sort((a,b) => {
+      const pa = a.goal>0 ? (a.sold||0)/a.goal : 0;
+      const pb = b.goal>0 ? (b.sold||0)/b.goal : 0;
+      return pb - pa;
+    });
+    if (sort === "sold")  return copy.sort((a,b) => (b.sold||0)-(a.sold||0));
+    if (sort === "name")  return copy.sort((a,b) => a.name.localeCompare(b.name));
+    if (sort === "goal")  return copy.sort((a,b) => (b.goal||0)-(a.goal||0));
+    return copy;
+  }
+
+  // Medal emoji for top 3 by % of goal
+  function getMedals() {
+    const ranked = [...cadets]
+      .map(c => ({ id: c.id, pct: c.goal>0 ? (c.sold||0)/c.goal : 0 }))
+      .sort((a,b) => b.pct - a.pct);
+    const medals = {};
+    const icons = ["🥇","🥈","🥉"];
+    ranked.slice(0,3).forEach((c,i) => { if(c.pct > 0) medals[c.id] = icons[i]; });
+    return medals;
+  }
+
   // ── RENDER ──
   function render() { renderKPIs(); renderTable(); }
-
-  function renderKPIs() {
     const totalSold = cadets.reduce((s,c) => s+(c.sold||0), 0);
     const totalGoal = cadets.reduce((s,c) => s+(c.goal||0), 0);
     const pct = totalGoal > 0 ? Math.round((totalSold/totalGoal)*100) : 0;
@@ -529,11 +565,14 @@
   function renderTable() {
     const tbody = document.getElementById("cadetTableBody");
     const isAdmin = userRole === "admin";
-    if (!cadets.length) {
+    const sorted  = getSortedCadets();
+    const medals  = getMedals();
+
+    if (!sorted.length) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="${isAdmin?8:7}">No cadets yet${isAdmin?" — click <strong>Add Cadet</strong> to get started":""}.`;
       return;
     }
-    tbody.innerHTML = cadets.map((c,i) => {
+    tbody.innerHTML = sorted.map((c,i) => {
       const sold = c.sold||0, goal = c.goal||0;
       const pct  = goal>0 ? Math.min(100,Math.round((sold/goal)*100)) : 0;
       const cls  = pct>=100?"high":pct>=60?"mid":"low";
@@ -543,6 +582,7 @@
         : pct>=75  ? `<span class="badge badge-yellow">🔥 Close</span>`
         :             `<span class="badge badge-red">🎯 In Progress</span>`;
       const upd = c.lastUpdated ? new Date(c.lastUpdated).toLocaleDateString() : "—";
+      const medal = medals[c.id] ? `<span style="font-size:1.1rem;margin-right:4px">${medals[c.id]}</span>` : "";
       const actCell = isAdmin ? `
         <td><div class="td-actions">
           <button class="act-btn act-edit" onclick="openEditModal('${c.id}')">✏️ Edit</button>
@@ -551,7 +591,7 @@
       return `
         <tr>
           <td style="color:var(--muted);font-weight:700">${i+1}</td>
-          <td class="td-name">${c.name}<a class="td-link" href="${c.url}" target="_blank">WAA Page ↗</a></td>
+          <td class="td-name">${medal}${c.name}<a class="td-link" href="${c.url}" target="_blank">WAA Page ↗</a></td>
           <td><span class="td-num">${sold}</span></td>
           <td><span class="td-goal">${goal}</span></td>
           <td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
@@ -613,14 +653,64 @@
       options:{ indexAxis:"y", responsive:true, plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true,title:{display:true,text:"Wreaths"}} }}
     });
 
-    const sorted = [...cadets].map(c=>({ name:c.name.replace(/^Cadet\s+/i,""), pct:c.goal>0?Math.min(100,Math.round((c.sold/c.goal)*100)):0 })).sort((a,b)=>b.pct-a.pct);
-    const rankCls = ["gold","silver","bronze"];
-    document.getElementById("leaderboard").innerHTML = sorted.map((c,i)=>`
-      <li class="lb-row">
-        <div class="lb-rank ${rankCls[i]||''}">${i+1}</div>
-        <span class="lb-name">${c.name}</span>
-        <span class="lb-pct">${c.pct}%</span>
-      </li>`).join("");
+    // Accumulation chart — cadet totals only, sorted by name
+    const accumSorted = [...cadets].sort((a,b) => a.name.localeCompare(b.name));
+    const accumLabels = accumSorted.map(c => c.name.replace(/^Cadet\s+/i,""));
+    let runSold = 0, runGoal = 0;
+    const accumSoldData = accumSorted.map(c => { runSold += (c.sold||0); return runSold; });
+    const accumGoalData = accumSorted.map(c => { runGoal += (c.goal||0); return runGoal; });
+
+    if (accumChart) accumChart.destroy();
+    accumChart = new Chart(document.getElementById("accumChart").getContext("2d"), {
+      type: "line",
+      data: {
+        labels: accumLabels,
+        datasets: [
+          {
+            label: "Cumulative Goal",
+            data: accumGoalData,
+            borderColor: "rgba(21,101,192,0.7)",
+            backgroundColor: "rgba(21,101,192,0.08)",
+            borderWidth: 2,
+            borderDash: [6,4],
+            pointRadius: 4,
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: "Cumulative Sold",
+            data: accumSoldData,
+            borderColor: "rgba(46,125,50,1)",
+            backgroundColor: "rgba(46,125,50,0.12)",
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(46,125,50,1)",
+            fill: true,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          tooltip: {
+            callbacks: {
+              afterBody: (items) => {
+                const idx = items[0]?.dataIndex;
+                if (idx === undefined) return "";
+                const g = accumGoalData[idx], s = accumSoldData[idx];
+                return g > 0 ? `Progress: ${Math.round((s/g)*100)}% of cumulative goal` : "";
+              }
+            }
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: "Total Wreaths" } },
+          x: { title: { display: true, text: "Cadets (cumulative)" } }
+        }
+      }
+    });
   }
 
   // ── ADD ──
