@@ -83,6 +83,18 @@
     .sum-val { font-size:1.6rem; font-weight:800; line-height:1; }
     .sum-lbl { font-size:.75rem; color:var(--muted); margin-top:3px; }
 
+    /* SQUADRON GOAL BANNER */
+    .squad-banner { background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); border-radius:14px; padding:22px 28px; margin-bottom:28px; color:white; box-shadow:0 2px 12px rgba(13,27,42,.25); }
+    .squad-banner-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+    .squad-banner-title { font-size:.95rem; font-weight:700; color:rgba(255,255,255,.85); display:flex; align-items:center; gap:8px; }
+    .squad-banner-nums { display:flex; align-items:baseline; gap:6px; }
+    .squad-sold-big { font-size:2rem; font-weight:800; color:white; line-height:1; }
+    .squad-goal-of  { font-size:.85rem; color:rgba(255,255,255,.55); }
+    .squad-pct-pill { font-size:1.1rem; font-weight:800; padding:4px 14px; border-radius:99px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:var(--accent); }
+    .squad-track { height:12px; background:rgba(255,255,255,.12); border-radius:99px; overflow:hidden; }
+    .squad-fill  { height:100%; border-radius:99px; transition:width .6s ease; background:linear-gradient(90deg,var(--accent),#e8c060); }
+    .squad-sub   { font-size:.75rem; color:rgba(255,255,255,.45); margin-top:8px; }
+
     /* TABLE */
     .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
     .section-title  { font-size:1rem; font-weight:700; color:var(--navy); }
@@ -213,6 +225,19 @@
       <div class="sum-card"><div class="sum-icon gold">🎯</div><div><div class="sum-val" id="kpi-goal">—</div><div class="sum-lbl">Combined Goal</div></div></div>
       <div class="sum-card"><div class="sum-icon purple">📈</div><div><div class="sum-val" id="kpi-pct">—</div><div class="sum-lbl">Overall Progress</div></div></div>
     </div>
+    <div class="squad-banner" id="squadBanner" style="display:none">
+      <div class="squad-banner-top">
+        <div class="squad-banner-title">🎖️ Squadron Overall Goal</div>
+        <div class="squad-banner-nums">
+          <span class="squad-sold-big" id="squad-sold-big">—</span>
+          <span class="squad-goal-of" id="squad-goal-of">of — wreaths</span>
+        </div>
+        <span class="squad-pct-pill" id="squad-pct-pill">—%</span>
+      </div>
+      <div class="squad-track"><div class="squad-fill" id="squad-fill" style="width:0%"></div></div>
+      <div class="squad-sub" id="squad-sub"></div>
+    </div>
+
     <div class="section-header">
       <div>
         <div class="section-title">Cadet Progress</div>
@@ -318,6 +343,11 @@
 const API = "/api/proxy";
 let cadets = [], userRole = null;
 let barChart = null, doughnutChart = null, gapChart = null, accumChart = null;
+
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function safeUrl(u) { return /^https?:\/\//i.test(u) ? u : "#"; }
 
 // ── AUTH ──
 function submitLogin() {
@@ -429,14 +459,36 @@ function refreshData() {
 // ── RENDER ──
 function render() { renderKPIs(); renderTable(); }
 
+function isCadet(c) { return !/^squadron$/i.test(c.name.trim()); }
+
 function renderKPIs() {
-  var totalSold = cadets.reduce(function(s,c) { return s+(c.sold||0); }, 0);
-  var totalGoal = cadets.reduce(function(s,c) { return s+(c.goal||0); }, 0);
-  var pct = totalGoal > 0 ? Math.round((totalSold/totalGoal)*100) : 0;
-  document.getElementById("kpi-cadets").textContent = cadets.length;
+  var forTotals  = cadets.filter(isCadet);
+  var squadEntry = cadets.find(function(c) { return !isCadet(c); });
+  var totalSold  = forTotals.reduce(function(s,c) { return s+(c.sold||0); }, 0);
+  var totalGoal  = forTotals.reduce(function(s,c) { return s+(c.goal||0); }, 0);
+  var pct        = totalGoal > 0 ? Math.round((totalSold/totalGoal)*100) : 0;
+  document.getElementById("kpi-cadets").textContent = forTotals.length;
   document.getElementById("kpi-sold").textContent   = totalSold.toLocaleString();
   document.getElementById("kpi-goal").textContent   = totalGoal.toLocaleString();
   document.getElementById("kpi-pct").textContent    = pct + "%";
+
+  var banner = document.getElementById("squadBanner");
+  if (squadEntry && squadEntry.goal > 0) {
+    var sqGoal    = squadEntry.goal;
+    var sqPct     = Math.round((totalSold / sqGoal) * 100);
+    var sqFill    = Math.min(100, sqPct);
+    var sqNeeded  = Math.max(0, sqGoal - totalSold);
+    document.getElementById("squad-sold-big").textContent  = totalSold.toLocaleString();
+    document.getElementById("squad-goal-of").textContent   = "of " + sqGoal.toLocaleString() + " wreaths";
+    document.getElementById("squad-pct-pill").textContent  = sqPct + "%";
+    document.getElementById("squad-fill").style.width      = sqFill + "%";
+    document.getElementById("squad-sub").textContent       = sqNeeded > 0
+      ? sqNeeded.toLocaleString() + " wreaths still needed to reach the squadron goal"
+      : "🎉 Squadron goal reached!";
+    banner.style.display = "";
+  } else {
+    banner.style.display = "none";
+  }
 }
 
 function getSortedCadets() {
@@ -479,11 +531,11 @@ function renderTable() {
     var upd    = c.lastUpdated ? new Date(c.lastUpdated).toLocaleDateString() : "—";
     var medal  = medals[c.id] ? '<span style="font-size:1.1rem;margin-right:4px">'+medals[c.id]+'</span>' : "";
     var actCell = isAdmin
-      ? '<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal(\''+c.id+'\')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet(\''+c.id+'\',\''+c.name.replace(/'/g,"\\'")+ '\')">✕</button></div></td>'
+      ? '<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal(\''+escHtml(c.id)+'\')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet(\''+escHtml(c.id)+'\',\''+escHtml(c.name).replace(/'/g,"&#39;")+ '\')">✕</button></div></td>'
       : "";
     return '<tr>'
       + '<td style="color:var(--muted);font-weight:700">'+(i+1)+'</td>'
-      + '<td class="td-name">'+medal+c.name+'<a class="td-link" href="'+c.url+'" target="_blank">WAA Page ↗</a></td>'
+      + '<td class="td-name">'+medal+escHtml(c.name)+'<a class="td-link" href="'+safeUrl(c.url)+'" target="_blank" rel="noopener noreferrer">WAA Page ↗</a></td>'
       + '<td><span class="td-num">'+sold+'</span></td>'
       + '<td><span class="td-goal">'+goal+'</span></td>'
       + '<td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill '+cls+'" style="width:'+pct+'%"></div></div><span class="bar-pct">'+pct+'%</span></div></td>'
@@ -626,7 +678,9 @@ function deleteCadet(id, name) {
   if(userRole!=="admin")return;
   if(!confirm("Remove "+name+" from the tracker?"))return;
   fetch(API+"?action=delete&id="+id,{method:"DELETE"})
-  .then(function(){cadets=cadets.filter(function(c){return c.id!==id;}); render(); setStatus("Removed "+name+" · "+ts());});
+  .then(function(r){return r.json();})
+  .then(function(d){if(d.error)throw new Error(d.error); cadets=cadets.filter(function(c){return c.id!==id;}); render(); setStatus("Removed "+name+" · "+ts());})
+  .catch(function(e){alert("Delete failed: "+(e.message||"Unknown error")); setStatus("⚠️ Delete failed");});
 }
 
 function setStatus(msg){document.getElementById("statusPill").textContent=msg;}
