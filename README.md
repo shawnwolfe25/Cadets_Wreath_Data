@@ -1,4 +1,4 @@
-/ ===================== README.md =====================
+This file is copyrighted by Shawn Miller - Springfield, Illinois
 # CAP Springfield WAA Tracker
 
 A live fundraising dashboard for Civil Air Patrol Springfield Composite Squadron cadets
