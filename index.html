@@ -1054,4 +1054,12 @@ function deleteCadet(id, name) {
     .then(r => r.json())
     .then(d => {
       if (d.error) throw new Error(d.error);
-    
+      allRecords = allRecords.filter(c => c.id !== id);
+      renderAll();
+      setStatus("Removed " + name + " · " + ts());
+    })
+    .catch(e => { alert("Delete failed: " + (e.message || "Unknown error")); setStatus("⚠️ Delete failed"); });
+}
+</script>
+</body>
+</html>
