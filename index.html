@@ -690,6 +690,7 @@ function renderTable() {
 function destroyChart(ref) { if (ref) { try { ref.destroy(); } catch(e){} } }
 
 function renderCharts() {
+  try {
   const cadets    = getCadets();
   const sq        = getSquadron();
   const totalSold = sq ? (sq.sold||0) : cadets.reduce((s,c)=>s+(c.sold||0),0);
@@ -956,6 +957,11 @@ function renderCharts() {
       }
     }
   });
+  } catch(e) {
+    console.error("renderCharts error:", e);
+    document.getElementById("leaderboard").innerHTML =
+      '<li style="color:red;padding:20px 0;text-align:center;font-weight:bold">Chart error: ' + e.message + '</li>';
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
