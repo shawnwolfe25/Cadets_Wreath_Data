@@ -213,11 +213,12 @@
     <h1>CAP Springfield Composite Squadron</h1>
     <p>Wreaths Across America — Cadet Fundraising Tracker</p>
     <div class="login-divider">Enter your access password</div>
-    <form onsubmit="submitLogin(); return false;">
+    <form onsubmit="submitLogin(); return false;" autocomplete="off">
+      <input type="text" name="username" id="login-user" value="cadet-tracker" autocomplete="username" style="display:none" aria-hidden="true"/>
       <label for="login-pass" style="display:none">Password</label>
       <div class="login-field">
         <span class="field-icon">🔒</span>
-        <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
+        <input id="login-pass" type="password" name="password" placeholder="Password" autocomplete="current-password"/>
       </div>
       <button class="login-btn" id="loginBtn" type="submit">🔓 Sign In</button>
     </form>
@@ -1053,8 +1054,4 @@ function deleteCadet(id, name) {
     .then(r => r.json())
     .then(d => {
       if (d.error) throw new Error(d.error);
-      allRecords = allRecords.filter(c => c.id !== id);
-      renderAll();
-      setStatus("Removed " + name + " · " + ts());
-    })
-    .catch(e => { alert("Delete failed: " + (e.mes
+    
