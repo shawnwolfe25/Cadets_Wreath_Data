@@ -539,8 +539,8 @@ function showApp() {
 //  PAGE NAV
 // ══════════════════════════════════════════════════════════════════════
 function showPage(p) {
-  document.getElementById("page-dashboard").style.display  = p === "dashboard"  ? "" : "none";
-  document.getElementById("page-analytics").style.display  = p === "analytics"  ? "" : "none";
+  document.getElementById("page-dashboard").style.display  = p === "dashboard"  ? "block" : "none";
+  document.getElementById("page-analytics").style.display  = p === "analytics"  ? "block" : "none";
   document.getElementById("nav-dash").classList.toggle("active",      p === "dashboard");
   document.getElementById("nav-analytics").classList.toggle("active", p === "analytics");
   if (p === "analytics") setTimeout(renderCharts, 50);
