@@ -555,6 +555,7 @@ function loadCadets() {
     .then(d => {
       allRecords = d.cadets || [];
       renderAll();
+      if (document.getElementById("page-analytics").style.display !== "none") renderCharts();
       setStatus("Updated " + ts());
     })
     .catch(() => setStatus("⚠️ Load failed"));
@@ -1056,8 +1057,4 @@ function deleteCadet(id, name) {
       renderAll();
       setStatus("Removed " + name + " · " + ts());
     })
-    .catch(e => { alert("Delete failed: " + (e.message || "Unknown error")); setStatus("⚠️ Delete failed"); });
-}
-</script>
-</body>
-</html>
+    .catch(e => { alert("Delete failed: " + (e.mes
