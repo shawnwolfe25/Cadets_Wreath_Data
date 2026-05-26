@@ -38,18 +38,51 @@ async function redisSet(key, value) {
 }
 
 // --- WAA Scraper ---
+// The WAA page renders stats server-side inside a div with data-template="wreaths-statistics"
+// Example: <center>15 Wreaths Sponsored<br>30.0% to Goal<br>35 To Go!<br></center>
+// We parse that block directly — no JS execution needed.
 async function scrapeWAAPage(url) {
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" }
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5"
+      }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
+
+    // Primary: parse the wreaths-statistics block
+    // Matches: "15 Wreaths Sponsored" inside the data-template="wreaths-statistics" div
+    const statsBlockMatch = html.match(/data-template=["']wreaths-statistics["'][^>]*>([\s\S]*?)<\/div>/i);
+    let scrapedSold = 0;
+    let scrapeError = null;
+
+    if (statsBlockMatch) {
+      const block = statsBlockMatch[1];
+      // Match "15 Wreaths Sponsored" or "1,234 Wreaths Sponsored"
+      const soldMatch = block.match(/([\d,]+)\s+Wreaths?\s+Sponsored/i);
+      if (soldMatch) {
+        scrapedSold = parseInt(soldMatch[1].replace(/,/g, ""), 10);
+      } else {
+        scrapeError = "Stats block found but could not parse wreath count.";
+      }
+    } else {
+      // Fallback: look for the pattern anywhere in the page
+      const fallbackMatch = html.match(/([\d,]+)\s+Wreaths?\s+Sponsored/i);
+      if (fallbackMatch) {
+        scrapedSold = parseInt(fallbackMatch[1].replace(/,/g, ""), 10);
+      } else {
+        scrapeError = "Could not find wreath count in page — WAA may have changed their layout.";
+      }
+    }
+
+    // Extract year from "2026 So Far" heading
     const yearMatch = html.match(/(\d{4})\s+So\s+Far/i);
     const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
-    const soldMatch = html.match(/(\d[\d,]*)\s+Wreaths?\s+so\s+Far/i);
-    const scrapedSold = soldMatch ? parseInt(soldMatch[1].replace(/,/g, ""), 10) : 0;
-    return { scrapedSold, year, lastUpdated: new Date().toISOString(), scrapeError: null };
+
+    return { scrapedSold, year, lastUpdated: new Date().toISOString(), scrapeError };
   } catch (err) {
     return { scrapedSold: 0, year: new Date().getFullYear(), lastUpdated: new Date().toISOString(), scrapeError: err.message };
   }
@@ -110,12 +143,16 @@ module.exports = async function handler(req, res) {
       if (!name || !waaUrl) return res.status(400).json({ error: "name and url are required" });
       const cadets  = await redisGet(CADETS_KEY);
       const scraped = await scrapeWAAPage(waaUrl);
-      const sold = (manualSold !== undefined && manualSold !== "") ? parseInt(manualSold, 10) || 0 : scraped.scrapedSold;
+      // Use scraped value if available; fall back to manually entered value
+      const sold = scraped.scrapedSold > 0
+        ? scraped.scrapedSold
+        : (manualSold !== undefined && manualSold !== "" ? parseInt(manualSold, 10) || 0 : 0);
       const newCadet = {
         id: Date.now().toString(),
         name, url: waaUrl,
         goal: parseInt(goal, 10) || 0,
-        sold, manualSold: sold,
+        sold,
+        manualSold: (manualSold !== undefined && manualSold !== "") ? parseInt(manualSold, 10) || 0 : sold,
         year: scraped.year,
         lastUpdated: scraped.lastUpdated,
         scrapeError: scraped.scrapeError
@@ -144,19 +181,22 @@ module.exports = async function handler(req, res) {
     }
 
     // ── REFRESH ──
+    // Re-scrapes every cadet's WAA page and updates live counts.
+    // If scraping succeeds (scrapedSold > 0), that value wins.
+    // Otherwise, keep the last known manualSold.
     if (req.method === "POST" && action === "refresh") {
       const cadets  = await redisGet(CADETS_KEY);
       const updated = await Promise.all(cadets.map(async c => {
         const scraped = await scrapeWAAPage(c.url);
-        const soldToUse = scraped.scrapedSold > 0 ? scraped.scrapedSold : (c.manualSold ?? c.sold ?? 0);
+        const soldToUse = scraped.scrapedSold > 0
+          ? scraped.scrapedSold
+          : (c.manualSold ?? c.sold ?? 0);
         return {
           ...c,
           sold: soldToUse,
           year: scraped.year,
           lastUpdated: scraped.lastUpdated,
-          scrapeError: scraped.scrapedSold === 0 && !scraped.scrapeError
-            ? "Live count is JS-rendered — showing last known value."
-            : scraped.scrapeError
+          scrapeError: scraped.scrapeError
         };
       }));
       await redisSet(CADETS_KEY, updated);
