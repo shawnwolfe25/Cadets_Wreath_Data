@@ -543,7 +543,7 @@ function showPage(p) {
   document.getElementById("page-analytics").style.display  = p === "analytics"  ? "" : "none";
   document.getElementById("nav-dash").classList.toggle("active",      p === "dashboard");
   document.getElementById("nav-analytics").classList.toggle("active", p === "analytics");
-  if (p === "analytics") renderCharts();
+  if (p === "analytics") setTimeout(renderCharts, 50);
 }
 
 // ══════════════════════════════════════════════════════════════════════
