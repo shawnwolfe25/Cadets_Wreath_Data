@@ -134,6 +134,7 @@
     .badge-gray   { background:#f0f0f0; color:#666; }
     .scrape-ok  { font-size:.65rem; color:var(--green2); }
     .scrape-err { font-size:.65rem; color:var(--muted); font-style:italic; }
+    .dup-note   { font-size:.65rem; color:var(--red); font-weight:600; cursor:help; }
     .td-actions { display:flex; gap:6px; }
     .act-btn { padding:5px 12px; border-radius:6px; border:none; font-size:.75rem; font-weight:600; cursor:pointer; transition:all .15s; }
     .act-edit { background:#e3f2fd; color:var(--blue); }
@@ -432,6 +433,11 @@
       <input id="edit-sold" type="number" min="0"/>
       <div class="fhint">Use only if the auto-pull from WAA is incorrect. Click "Refresh Live Data" in the header to re-fetch from WAA.</div>
     </div>
+    <div class="fgroup">
+      <label for="edit-duplicates">Duplicate / Matched Wreaths to Subtract</label>
+      <input id="edit-duplicates" type="number" min="0" placeholder="e.g. 10"/>
+      <div class="fhint">During a WAA matching period the live count can double what a cadet actually sold (10 sold can show as 20). Enter how many to subtract — it's applied automatically every time the count refreshes, and stays in effect until you change it back to 0.</div>
+    </div>
     <div class="modal-err" id="editErr"></div>
     <div class="modal-foot">
       <button class="mbtn mbtn-cancel" onclick="closeEditModal()">Cancel</button>
@@ -668,13 +674,16 @@ function renderTable() {
     const scrapeNote = c.scrapeError
       ? `<span class="scrape-err" title="${escHtml(c.scrapeError)}">⚠ manual</span>`
       : `<span class="scrape-ok">✓ live</span>`;
+    const dupNote = c.duplicates > 0
+      ? `<br><span class="dup-note" title="Raw WAA count: ${c.rawSold ?? (sold + c.duplicates)} minus ${c.duplicates} duplicate/matched wreath${c.duplicates===1?'':'s'}">−${c.duplicates} dup</span>`
+      : "";
     const actCell = isAdmin
       ? `<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal('${escHtml(c.id)}')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet('${escHtml(c.id)}','${escHtml(c.name).replace(/'/g,"&#39;")}')">✕</button></div></td>`
       : "";
     return `<tr>
       <td style="color:var(--muted);font-weight:700">${i+1}</td>
       <td class="td-name">${medal}${escHtml(c.name)}<a class="td-link" href="${safeUrl(c.url)}" target="_blank" rel="noopener noreferrer">WAA Page ↗</a></td>
-      <td><span class="td-num">${sold}</span> ${scrapeNote}</td>
+      <td><span class="td-num">${sold}</span> ${scrapeNote}${dupNote}</td>
       <td><span class="td-goal">${goal}</span></td>
       <td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div><span class="bar-pct">${pct}%</span></div></td>
       <td>${badge}</td>
@@ -1016,6 +1025,7 @@ function openEditModal(id) {
   document.getElementById("edit-name").value = c.name;
   document.getElementById("edit-goal").value = c.goal||0;
   document.getElementById("edit-sold").value = c.sold||0;
+  document.getElementById("edit-duplicates").value = c.duplicates||0;
   document.getElementById("editErr").textContent = "";
   document.getElementById("editModal").style.display = "flex";
 }
@@ -1026,16 +1036,22 @@ function submitEdit() {
   const name = document.getElementById("edit-name").value.trim();
   const goal = document.getElementById("edit-goal").value.trim();
   const sold = document.getElementById("edit-sold").value.trim();
+  const duplicates = document.getElementById("edit-duplicates").value.trim();
   const err  = document.getElementById("editErr");
   if (!name)   { err.textContent = "Name cannot be empty."; return; }
   if (goal === "" || parseInt(goal) < 0) { err.textContent = "Please enter a valid goal."; return; }
+  if (duplicates !== "" && parseInt(duplicates) < 0) { err.textContent = "Duplicates to subtract can't be negative."; return; }
   const btn = document.getElementById("editBtn");
   btn.innerHTML = '<span class="spinner"></span> Saving…';
   btn.disabled = true;
   err.textContent = "";
   fetch(API + "?action=edit&id=" + id, {
     method: "PUT", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, goal: parseInt(goal), manualSold: sold === "" ? undefined : parseInt(sold) })
+    body: JSON.stringify({
+      name, goal: parseInt(goal),
+      manualSold: sold === "" ? undefined : parseInt(sold),
+      duplicates: duplicates === "" ? undefined : parseInt(duplicates)
+    })
   })
   .then(r => r.json())
   .then(d => {

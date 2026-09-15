@@ -56,3 +56,8 @@ cd waa-tracker
 - Cadet goals are pulled from their WAA page; you can override by setting
   a manual goal when adding a cadet
 - The chart color-codes bars: green = goal met, red = still in progress
+- **Duplicate/matched wreaths**: during a WAA matching period, a cadet's live
+  page can double-count sales (10 sold shows as 20 sponsored). Open a cadet's
+  Edit modal and enter the number of duplicates to subtract in "Duplicate /
+  Matched Wreaths to Subtract" — that number is re-applied automatically
+  every time the count refreshes, so it stays correct until you reset it to 0.
