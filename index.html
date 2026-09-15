@@ -100,6 +100,12 @@
     .kpi-icon.purple { background:#ede7f6; }
     .kpi-val { font-size:1.6rem; font-weight:800; line-height:1; }
     .kpi-lbl { font-size:.75rem; color:var(--muted); margin-top:3px; }
+    .status-kpis { grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:0; }
+    .status-kpis .kpi-card { padding:14px 16px; }
+    .needpush-row { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:8px; background:#ffebee; margin-bottom:6px; font-size:.82rem; }
+    .needpush-row .np-name { font-weight:700; color:var(--navy); }
+    .needpush-row .np-stat { color:#b71c1c; font-weight:700; font-size:.78rem; }
+    .needpush-empty { font-size:.82rem; color:var(--muted); padding:8px 2px; }
 
     /* ── TABLE ── */
     .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
@@ -164,7 +170,7 @@
     .lb-rank.bronze { background:#a1887f; }
     .lb-name { flex:1; font-size:.85rem; font-weight:600; }
     .lb-sold { font-size:.78rem; color:var(--muted); }
-    .lb-pct  { font-size:.85rem; font-weight:700; color:var(--blue); min-width:42px; text-align:right; }
+    .lb-pct  { font-size:.78rem; font-weight:700; color:var(--blue); min-width:56px; text-align:right; }
 
     /* ── MODALS ── */
     .overlay { position:fixed; inset:0; background:rgba(10,20,40,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
@@ -338,8 +344,8 @@
   <!-- ─────────────────────── ANALYTICS PAGE ─────────────────────── -->
   <div id="page-analytics">
 
-    <!-- Squadron goal coverage -->
-    <div class="analytics-section-label">🎖️ Squadron Overview</div>
+    <!-- Command overview -->
+    <div class="analytics-section-label">🎖️ Squadron Command Overview</div>
     <div class="charts-grid-2">
       <div class="chart-card">
         <h3>🎗️ Squadron Goal Coverage</h3>
@@ -347,39 +353,48 @@
         <canvas id="doughnutChart" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <h3>🏆 Cadet Leaderboard — % of Personal Goal</h3>
-        <p class="chart-sub">Ranked by how close each cadet is to their own goal</p>
+        <h3>📋 Squadron Status</h3>
+        <p class="chart-sub">Where things stand right now, at a glance</p>
+        <div class="cadet-kpis status-kpis">
+          <div class="kpi-card"><div class="kpi-icon blue">👥</div><div><div class="kpi-val" id="kpi-participation">—</div><div class="kpi-lbl">Actively Selling</div></div></div>
+          <div class="kpi-card"><div class="kpi-icon green">🎯</div><div><div class="kpi-val" id="kpi-atgoal">—</div><div class="kpi-lbl">Cadets At Goal</div></div></div>
+          <div class="kpi-card"><div class="kpi-icon gold">📦</div><div><div class="kpi-val" id="kpi-avgsold">—</div><div class="kpi-lbl">Avg Wreaths / Cadet</div></div></div>
+          <div class="kpi-card"><div class="kpi-icon purple">⚠️</div><div><div class="kpi-val" id="kpi-needpush">—</div><div class="kpi-lbl">Need a Push (&lt;50%)</div></div></div>
+        </div>
+        <div id="needPushWrap" style="margin-top:16px">
+          <div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Follow Up With</div>
+          <ul id="needPushList" style="list-style:none"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leadership -->
+    <div class="analytics-section-label">🏆 Cadet Leadership — Wreaths Sponsored</div>
+    <div class="charts-grid-2">
+      <div class="chart-card">
+        <h3>🏆 Top Sellers</h3>
+        <p class="chart-sub">Ranked by total wreaths sponsored</p>
         <ul class="leaderboard" id="leaderboard"></ul>
+      </div>
+      <div class="chart-card">
+        <h3>📊 Share of Squadron Total</h3>
+        <p class="chart-sub" id="shareChartSub">Each cadet's slice of everything sold</p>
+        <canvas id="shareChart" height="220"></canvas>
       </div>
     </div>
 
     <!-- Per-cadet breakdown -->
     <div class="analytics-section-label">👤 Cadet Detail</div>
     <div class="chart-card chart-full">
-      <h3>📊 Wreaths Sold vs. Personal Goal — Per Cadet</h3>
-      <p class="chart-sub">Green bar = goal met or exceeded · Red bar = still in progress</p>
+      <h3>📊 Wreaths Sold vs. Personal Goal — Ranked by Total Sold</h3>
+      <p class="chart-sub">Top sellers first · green = goal met, red = still in progress</p>
       <canvas id="barChart" height="110"></canvas>
     </div>
 
-    <div class="charts-grid-2">
-      <div class="chart-card">
-        <h3>📉 Wreaths Still Needed to Reach Goal</h3>
-        <p class="chart-sub">How many more wreaths each cadet needs to hit their personal goal</p>
-        <canvas id="gapChart" height="220"></canvas>
-      </div>
-      <div class="chart-card">
-        <h3>🥧 Goal Distribution — Cadet Share of Combined Goal</h3>
-        <p class="chart-sub">Each cadet's personal goal as a share of the combined cadet total</p>
-        <canvas id="goalPieChart" height="220"></canvas>
-      </div>
-    </div>
-
-    <!-- Cumulative -->
-    <div class="analytics-section-label">📈 Cumulative</div>
     <div class="chart-card chart-full">
-      <h3>📈 Cumulative Wreaths Sold vs. Combined Goal</h3>
-      <p class="chart-sub">Running total across all cadets compared to the running goal line</p>
-      <canvas id="accumChart" height="90"></canvas>
+      <h3>📉 Wreaths Still Needed to Reach Goal</h3>
+      <p class="chart-sub">Highest priority first · green = goal met, red = still needs wreaths</p>
+      <canvas id="gapChart" height="90"></canvas>
     </div>
 
   </div>
@@ -455,7 +470,7 @@ let allRecords = [];   // everything from Redis (cadets + squadron entry)
 let userRole   = null;
 
 // Chart instances — kept so we can destroy before redraw
-let chartBar, chartDoughnut, chartGap, chartGoalPie, chartAccum;
+let chartBar, chartDoughnut, chartGap, chartShare;
 
 // ══════════════════════════════════════════════════════════════════════
 //  HELPERS
@@ -640,11 +655,12 @@ function getSortedCadets() {
 }
 
 function getMedals() {
+  // Leadership is ranked by total wreaths sponsored, not % of personal goal.
   const ranked = getCadets().slice()
-    .map(c=>({id:c.id, pct:c.goal>0?(c.sold||0)/c.goal:0}))
-    .sort((a,b)=>b.pct-a.pct);
+    .map(c=>({id:c.id, sold:c.sold||0}))
+    .sort((a,b)=>b.sold-a.sold);
   const medals = {}, icons = ["🥇","🥈","🥉"];
-  ranked.slice(0,3).forEach((c,i)=>{ if(c.pct>0) medals[c.id]=icons[i]; });
+  ranked.slice(0,3).forEach((c,i)=>{ if(c.sold>0) medals[c.id]=icons[i]; });
   return medals;
 }
 
@@ -706,16 +722,44 @@ function renderCharts() {
   const sqGoal    = sq ? (sq.goal||0) : 0;
 
   if (!cadets.length) {
-    ["barChart","doughnutChart","gapChart","goalPieChart","accumChart"].forEach(id=>{
+    ["barChart","doughnutChart","gapChart","shareChart"].forEach(id=>{
       const ctx = document.getElementById(id);
       if (ctx) ctx.getContext("2d").clearRect(0,0,ctx.width,ctx.height);
     });
     document.getElementById("leaderboard").innerHTML = '<li style="color:var(--muted);padding:20px 0;text-align:center">No cadet data yet.</li>';
+    ["kpi-participation","kpi-atgoal","kpi-avgsold","kpi-needpush"].forEach(id=>{
+      const el = document.getElementById(id); if (el) el.textContent = "—";
+    });
+    const npEl = document.getElementById("needPushList");
+    if (npEl) npEl.innerHTML = `<li class="needpush-empty">No cadet data yet.</li>`;
     return;
   }
 
-  // Sort cadets alphabetically for consistent chart order
-  const sorted = cadets.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  // ── Squadron Status KPIs (command overview) ──
+  const activeCadets  = cadets.filter(c => (c.sold||0) > 0).length;
+  const atGoalCadets  = cadets.filter(c => c.goal>0 && (c.sold||0) >= c.goal).length;
+  const needPushCadets = cadets.filter(c => c.goal>0 && ((c.sold||0)/c.goal) < 0.5).length;
+  const avgSold        = Math.round(cadets.reduce((s,c)=>s+(c.sold||0),0) / cadets.length);
+  document.getElementById("kpi-participation").textContent = activeCadets + " / " + cadets.length;
+  document.getElementById("kpi-atgoal").textContent        = atGoalCadets;
+  document.getElementById("kpi-avgsold").textContent       = avgSold.toLocaleString();
+  document.getElementById("kpi-needpush").textContent      = needPushCadets;
+
+  const needPushList = cadets
+    .filter(c => c.goal>0 && ((c.sold||0)/c.goal) < 0.5)
+    .sort((a,b) => (a.sold||0)/a.goal - (b.sold||0)/b.goal)
+    .slice(0, 5);
+  const needPushEl = document.getElementById("needPushList");
+  needPushEl.innerHTML = needPushList.length
+    ? needPushList.map(c => {
+        const pct = Math.round(((c.sold||0)/c.goal)*100);
+        return `<li class="needpush-row"><span class="np-name">${escHtml(c.name.replace(/^Cadet\s+/i,""))}</span><span class="np-stat">${c.sold||0}/${c.goal} · ${pct}%</span></li>`;
+      }).join("")
+    : `<li class="needpush-empty">Nobody under 50% — squadron's in good shape.</li>`;
+
+  // Rank cadets by total wreaths sponsored — this is squadron leadership, so
+  // the top seller leads every chart, not whoever's closest to their own goal.
+  const sorted = cadets.slice().sort((a,b)=>(b.sold||0)-(a.sold||0));
   const shortNames = sorted.map(c=>c.name.replace(/^Cadet\s+/i,""));
   const goals  = sorted.map(c=>c.goal||0);
   const sold   = sorted.map(c=>c.sold||0);
@@ -818,13 +862,17 @@ function renderCharts() {
     }]
   });
 
-  // ── 3. GAP CHART: Wreaths still needed per cadet ──
+  // ── 3. GAP CHART: Wreaths still needed per cadet, highest priority first ──
   destroyChart(chartGap);
-  const gaps = sorted.map(c => Math.max(0, (c.goal||0) - (c.sold||0)));
+  const byGap = cadets.slice()
+    .map(c => ({ name: c.name.replace(/^Cadet\s+/i,""), gap: Math.max(0, (c.goal||0) - (c.sold||0)) }))
+    .sort((a,b) => b.gap - a.gap);
+  const gapNames = byGap.map(c=>c.name);
+  const gaps     = byGap.map(c=>c.gap);
   chartGap = new Chart(document.getElementById("gapChart").getContext("2d"), {
     type: "bar",
     data: {
-      labels: shortNames,
+      labels: gapNames,
       datasets: [{
         label: "Wreaths Still Needed",
         data: gaps,
@@ -852,43 +900,52 @@ function renderCharts() {
     }
   });
 
-  // ── 4. GOAL PIE: Each cadet's share of the combined goal ──
-  destroyChart(chartGoalPie);
-  const totalGoal = goals.reduce((a,b)=>a+b,0);
-  const pieColors = [
-    "#1565c0","#2e7d32","#c62828","#f9a825","#6a1b9a",
-    "#00838f","#e65100","#37474f","#ad1457","#1b5e20",
-    "#bf360c","#0d47a1","#558b2f","#ff8f00","#4527a0"
-  ];
-  chartGoalPie = new Chart(document.getElementById("goalPieChart").getContext("2d"), {
-    type: "pie",
+  // ── 4. SHARE CHART: each cadet's % of the squadron's total wreaths sold,
+  // ranked highest to lowest. One hue for every bar (nominal category, not a
+  // ranked value) with the top seller picked out in gold — that's the whole
+  // story: who is actually carrying this fundraiser, at a glance. ──
+  destroyChart(chartShare);
+  const totalSoldForShare = sold.reduce((a,b)=>a+b,0);
+  const shareVals = sold.map(s => totalSoldForShare > 0 ? Math.round((s/totalSoldForShare)*1000)/10 : 0);
+  const top3Share = shareVals.slice(0,3).reduce((a,b)=>a+b,0);
+  const shareSub = document.getElementById("shareChartSub");
+  if (shareSub) {
+    shareSub.textContent = totalSoldForShare > 0
+      ? `Top 3 sellers account for ${Math.round(top3Share)}% of everything the squadron has sold`
+      : "Each cadet's slice of everything sold";
+  }
+  chartShare = new Chart(document.getElementById("shareChart").getContext("2d"), {
+    type: "bar",
     data: {
       labels: shortNames,
       datasets: [{
-        data: goals,
-        backgroundColor: shortNames.map((_,i)=>pieColors[i % pieColors.length]+"cc"),
-        borderColor:     shortNames.map((_,i)=>pieColors[i % pieColors.length]),
-        borderWidth: 2
+        label: "Share of Squadron Total",
+        data: shareVals,
+        backgroundColor: shareVals.map((_,i) => i === 0 ? "rgba(200,169,81,0.85)" : "rgba(21,101,192,0.75)"),
+        borderColor:     shareVals.map((_,i) => i === 0 ? "rgba(200,169,81,1)"    : "rgba(21,101,192,1)"),
+        borderWidth: 2,
+        borderRadius: 5
       }]
     },
     options: {
+      indexAxis: "y",
       responsive: true,
       plugins: {
-        legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } },
+        legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => {
-              const val = ctx.parsed;
-              const pct = totalGoal > 0 ? Math.round((val/totalGoal)*100) : 0;
-              return ` ${ctx.label}: ${val} wreaths (${pct}% of group goal)`;
-            }
+            label: (ctx) => ` ${ctx.parsed.x}% of squadron total (${sold[ctx.dataIndex]} wreaths)`
           }
         }
+      },
+      scales: {
+        x: { beginAtZero: true, title: { display: true, text: "% of Squadron Total" } },
+        y: { grid: { display: false } }
       }
     }
   });
 
-  // ── 5. LEADERBOARD: % of goal, ranked ──
+  // ── 5. LEADERBOARD: ranked by total wreaths sponsored ──
   const lbSorted = cadets.slice()
     .map(c => ({
       name: c.name.replace(/^Cadet\s+/i,""),
@@ -896,76 +953,16 @@ function renderCharts() {
       goal: c.goal||0,
       pct:  c.goal>0 ? Math.min(100,Math.round(((c.sold||0)/c.goal)*100)) : 0
     }))
-    .sort((a,b)=>b.pct-a.pct);
+    .sort((a,b)=>b.sold-a.sold);
   const rankCls = ["gold","silver","bronze"];
   document.getElementById("leaderboard").innerHTML = lbSorted.map((c,i) =>
     `<li class="lb-row">
       <div class="lb-rank ${rankCls[i]||''}">${i+1}</div>
       <span class="lb-name">${escHtml(c.name)}</span>
-      <span class="lb-sold">${c.sold}/${c.goal}</span>
-      <span class="lb-pct">${c.pct}%</span>
+      <span class="lb-sold">${c.sold} sponsored</span>
+      <span class="lb-pct">${c.pct}% goal</span>
     </li>`
   ).join("");
-
-  // ── 6. CUMULATIVE LINE CHART ──
-  destroyChart(chartAccum);
-  // Sort by name for stable order, then accumulate
-  const accumSorted = cadets.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  const accumLabels = accumSorted.map(c=>c.name.replace(/^Cadet\s+/i,""));
-  let runSold = 0, runGoal = 0;
-  const accumSoldData = accumSorted.map(c=>{ runSold+=(c.sold||0); return runSold; });
-  const accumGoalData = accumSorted.map(c=>{ runGoal+=(c.goal||0); return runGoal; });
-
-  chartAccum = new Chart(document.getElementById("accumChart").getContext("2d"), {
-    type: "line",
-    data: {
-      labels: accumLabels,
-      datasets: [
-        {
-          label: "Cumulative Goal",
-          data: accumGoalData,
-          borderColor: "rgba(21,101,192,0.7)",
-          backgroundColor: "rgba(21,101,192,0.06)",
-          borderWidth: 2,
-          borderDash: [7,4],
-          pointRadius: 4,
-          pointBackgroundColor: "rgba(21,101,192,0.7)",
-          fill: false,
-          tension: 0.3
-        },
-        {
-          label: "Cumulative Sold",
-          data: accumSoldData,
-          borderColor: "rgba(46,125,50,1)",
-          backgroundColor: "rgba(46,125,50,0.1)",
-          borderWidth: 3,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(46,125,50,1)",
-          fill: true,
-          tension: 0.3
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "top" },
-        tooltip: {
-          callbacks: {
-            afterBody: (items) => {
-              const sold = items.find(i=>i.dataset.label==="Cumulative Sold")?.parsed.y || 0;
-              const goal = items.find(i=>i.dataset.label==="Cumulative Goal")?.parsed.y || 0;
-              if (goal > 0) return [`${Math.round((sold/goal)*100)}% of running goal`];
-            }
-          }
-        }
-      },
-      scales: {
-        x: { title: { display: true, text: "Cadets (alphabetical)" } },
-        y: { beginAtZero: true, title: { display: true, text: "Total Wreaths" } }
-      }
-    }
-  });
   } catch(e) {
     console.error("renderCharts error:", e);
     document.getElementById("leaderboard").innerHTML =
