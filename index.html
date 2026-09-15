@@ -434,7 +434,7 @@
       <div class="fhint">Use only if the auto-pull from WAA is incorrect. Click "Refresh Live Data" in the header to re-fetch from WAA.</div>
     </div>
     <div class="fgroup">
-      <label for="edit-duplicates">Duplicate / Matched Wreaths to Subtract</label>
+      <label for="edit-duplicates">Matched Wreaths to Subtract</label>
       <input id="edit-duplicates" type="number" min="0" placeholder="e.g. 10"/>
       <div class="fhint">During a WAA matching period the live count can double what a cadet actually sold (10 sold can show as 20). Enter how many to subtract — it's applied automatically every time the count refreshes, and stays in effect until you change it back to 0.</div>
     </div>
@@ -675,7 +675,7 @@ function renderTable() {
       ? `<span class="scrape-err" title="${escHtml(c.scrapeError)}">⚠ manual</span>`
       : `<span class="scrape-ok">✓ live</span>`;
     const dupNote = c.duplicates > 0
-      ? `<br><span class="dup-note" title="Raw WAA count: ${c.rawSold ?? (sold + c.duplicates)} minus ${c.duplicates} duplicate/matched wreath${c.duplicates===1?'':'s'}">−${c.duplicates} dup</span>`
+      ? `<br><span class="dup-note" title="Raw WAA count: ${c.rawSold ?? (sold + c.duplicates)} minus ${c.duplicates} matched wreath${c.duplicates===1?'':'s'}">−${c.duplicates} match</span>`
       : "";
     const actCell = isAdmin
       ? `<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal('${escHtml(c.id)}')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet('${escHtml(c.id)}','${escHtml(c.name).replace(/'/g,"&#39;")}')">✕</button></div></td>`
