@@ -88,6 +88,16 @@ async function scrapeWAAPage(url) {
   }
 }
 
+// --- Duplicate/matched-wreath adjustment ---
+// During certain windows WAA's live page includes matched wreaths, which can
+// double-count what a cadet actually sold (e.g. 10 sold shows as 20 sponsored).
+// `duplicates` is an admin-entered number that gets subtracted from the raw
+// scraped/manual count to produce the "sold" figure the dashboard displays.
+function netSold(raw, duplicates) {
+  const d = Math.max(0, parseInt(duplicates, 10) || 0);
+  return Math.max(0, (raw || 0) - d);
+}
+
 // --- Body parser ---
 async function parseBody(req) {
   return new Promise(resolve => {
@@ -139,20 +149,23 @@ module.exports = async function handler(req, res) {
 
     // ── ADD ──
     if (req.method === "POST" && action === "add") {
-      const { name, url: waaUrl, goal, manualSold } = await parseBody(req);
+      const { name, url: waaUrl, goal, manualSold, duplicates } = await parseBody(req);
       if (!name || !waaUrl) return res.status(400).json({ error: "name and url are required" });
       const cadets  = await redisGet(CADETS_KEY);
       const scraped = await scrapeWAAPage(waaUrl);
       // Use scraped value if available; fall back to manually entered value
-      const sold = scraped.scrapedSold > 0
+      const rawSold = scraped.scrapedSold > 0
         ? scraped.scrapedSold
         : (manualSold !== undefined && manualSold !== "" ? parseInt(manualSold, 10) || 0 : 0);
+      const dup = Math.max(0, parseInt(duplicates, 10) || 0);
       const newCadet = {
         id: Date.now().toString(),
         name, url: waaUrl,
         goal: parseInt(goal, 10) || 0,
-        sold,
-        manualSold: (manualSold !== undefined && manualSold !== "") ? parseInt(manualSold, 10) || 0 : sold,
+        rawSold,
+        duplicates: dup,
+        sold: netSold(rawSold, dup),
+        manualSold: (manualSold !== undefined && manualSold !== "") ? parseInt(manualSold, 10) || 0 : rawSold,
         year: scraped.year,
         lastUpdated: scraped.lastUpdated,
         scrapeError: scraped.scrapeError
@@ -164,18 +177,32 @@ module.exports = async function handler(req, res) {
 
     // ── EDIT ──
     if (req.method === "PUT" && action === "edit") {
-      const { name, goal, manualSold } = await parseBody(req);
+      const { name, goal, manualSold, duplicates } = await parseBody(req);
       if (!id) return res.status(400).json({ error: "id is required" });
       const cadets = await redisGet(CADETS_KEY);
       const idx = cadets.findIndex(c => c.id === id);
       if (idx === -1) return res.status(404).json({ error: "Cadet not found" });
       if (name) cadets[idx].name = name.trim();
       if (goal !== undefined) cadets[idx].goal = parseInt(goal, 10) || 0;
-      if (manualSold !== undefined && manualSold !== "") {
-        const s = parseInt(manualSold, 10) || 0;
-        cadets[idx].sold = s;
-        cadets[idx].manualSold = s;
+
+      // Older records saved before the duplicates feature won't have rawSold yet —
+      // reconstruct it from the last known sold + duplicates already subtracted.
+      if (cadets[idx].rawSold === undefined) {
+        cadets[idx].rawSold = (cadets[idx].sold || 0) + (cadets[idx].duplicates || 0);
       }
+
+      if (manualSold !== undefined && manualSold !== "") {
+        // A manual override replaces the raw (pre-duplicate) count.
+        cadets[idx].rawSold    = parseInt(manualSold, 10) || 0;
+        cadets[idx].manualSold = cadets[idx].rawSold;
+      }
+
+      if (duplicates !== undefined && duplicates !== "") {
+        cadets[idx].duplicates = Math.max(0, parseInt(duplicates, 10) || 0);
+      }
+
+      cadets[idx].sold = netSold(cadets[idx].rawSold, cadets[idx].duplicates || 0);
+
       await redisSet(CADETS_KEY, cadets);
       return res.status(200).json({ cadet: cadets[idx] });
     }
@@ -184,16 +211,22 @@ module.exports = async function handler(req, res) {
     // Re-scrapes every cadet's WAA page and updates live counts.
     // If scraping succeeds (scrapedSold > 0), that value wins.
     // Otherwise, keep the last known manualSold.
+    // Each cadet's saved `duplicates` count is re-applied to the fresh raw
+    // total every time, since WAA's matching-period double-count keeps
+    // recurring on every refresh until the matching window ends.
     if (req.method === "POST" && action === "refresh") {
       const cadets  = await redisGet(CADETS_KEY);
       const updated = await Promise.all(cadets.map(async c => {
         const scraped = await scrapeWAAPage(c.url);
-        const soldToUse = scraped.scrapedSold > 0
+        const rawSold = scraped.scrapedSold > 0
           ? scraped.scrapedSold
-          : (c.manualSold ?? c.sold ?? 0);
+          : (c.manualSold ?? c.rawSold ?? c.sold ?? 0);
+        const dup = c.duplicates || 0;
         return {
           ...c,
-          sold: soldToUse,
+          rawSold,
+          duplicates: dup,
+          sold: netSold(rawSold, dup),
           year: scraped.year,
           lastUpdated: scraped.lastUpdated,
           scrapeError: scraped.scrapeError
