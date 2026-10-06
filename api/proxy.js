@@ -1,8 +1,47 @@
+const crypto = require("crypto");
+
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const PASS_ADMIN  = process.env.WAA_PASS_ADMIN;
 const PASS_READ   = process.env.WAA_PASS_READ;
 const CADETS_KEY  = "waa:cadets";
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // sessions last 12 hours
+
+// Signing secret for session tokens. If WAA_TOKEN_SECRET isn't set, derive one
+// from the two passwords — changing either password then logs everyone out.
+const TOKEN_SECRET = process.env.WAA_TOKEN_SECRET
+  || ((PASS_ADMIN || PASS_READ) ? `${PASS_ADMIN || ""}:${PASS_READ || ""}` : null);
+
+// --- Auth helpers ---
+function safeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const ha = crypto.createHash("sha256").update(a).digest();
+  const hb = crypto.createHash("sha256").update(b).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+function sign(data) {
+  return crypto.createHmac("sha256", TOKEN_SECRET).update(data).digest("base64url");
+}
+
+function issueToken(role) {
+  const payload = Buffer.from(JSON.stringify({ role, exp: Date.now() + TOKEN_TTL_MS })).toString("base64url");
+  return `${payload}.${sign(payload)}`;
+}
+
+// Returns "admin" | "readonly" | null
+function verifyToken(req) {
+  if (!TOKEN_SECRET) return null;
+  const header = req.headers.authorization || "";
+  const token  = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig || !safeEqual(sig, sign(payload))) return null;
+  try {
+    const { role, exp } = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (typeof exp !== "number" || Date.now() > exp) return null;
+    return role === "admin" || role === "readonly" ? role : null;
+  } catch { return null; }
+}
 
 // --- Redis GET ---
 async function redisGet(key) {
@@ -111,7 +150,7 @@ async function parseBody(req) {
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") return res.status(200).end();
 
@@ -126,9 +165,12 @@ module.exports = async function handler(req, res) {
       const body = await parseBody(req);
       const password = body.password;
       if (!password) return res.status(400).json({ error: "Password required" });
-      if (password === PASS_ADMIN) return res.status(200).json({ role: "admin" });
-      if (password === PASS_READ)  return res.status(200).json({ role: "readonly" });
-      return res.status(401).json({ error: "Incorrect password" });
+      if (!TOKEN_SECRET) return res.status(500).json({ error: "Server passwords are not configured" });
+      let role = null;
+      if (PASS_ADMIN && safeEqual(password, PASS_ADMIN))     role = "admin";
+      else if (PASS_READ && safeEqual(password, PASS_READ)) role = "readonly";
+      if (!role) return res.status(401).json({ error: "Incorrect password" });
+      return res.status(200).json({ role, token: issueToken(role) });
     }
 
     // ── DEBUG ──
@@ -140,6 +182,14 @@ module.exports = async function handler(req, res) {
         hasPassRead:   !!PASS_READ
       });
     }
+
+    // ── AUTH GATE ──
+    // Everything below requires a valid session token. Reads need any role;
+    // writes (add/edit/refresh/delete) need admin.
+    const role = verifyToken(req);
+    if (!role) return res.status(401).json({ error: "Not signed in or session expired" });
+    const isRead = req.method === "GET" && action === "list";
+    if (!isRead && role !== "admin") return res.status(403).json({ error: "Admin access required" });
 
     // ── LIST ──
     if (req.method === "GET" && action === "list") {

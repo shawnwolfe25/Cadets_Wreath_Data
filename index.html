@@ -468,6 +468,7 @@
 const API = "/api/proxy";
 let allRecords = [];   // everything from Redis (cadets + squadron entry)
 let userRole   = null;
+let authToken  = null; // signed session token from the server
 
 // Chart instances — kept so we can destroy before redraw
 let chartBar, chartDoughnut, chartGap, chartShare;
@@ -481,6 +482,21 @@ function escHtml(s) {
 function safeUrl(u) { return /^https?:\/\//i.test(u) ? u : "#"; }
 function ts() { return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); }
 function setStatus(msg) { document.getElementById("statusPill").textContent = msg; }
+
+// fetch() wrapper that sends the session token and signs out on 401
+function apiFetch(query, opts = {}) {
+  const headers = Object.assign({}, opts.headers, authToken ? { Authorization: "Bearer " + authToken } : {});
+  return fetch(API + query, Object.assign({}, opts, { headers }))
+    .then(r => {
+      if (r.status === 401) {
+        logout();
+        document.getElementById("loginErr").textContent = "Your session expired. Please sign in again.";
+        document.getElementById("loginErr").style.display = "block";
+        throw new Error("Session expired");
+      }
+      return r.json();
+    });
+}
 
 // Cadets are every record whose name is NOT "squadron" (case-insensitive)
 function getCadets()   { return allRecords.filter(c => !/^squadron$/i.test(c.name.trim())); }
@@ -505,8 +521,10 @@ function submitLogin() {
   .then(r => r.json())
   .then(d => {
     if (d.error) throw new Error(d.error);
-    userRole = d.role;
+    userRole  = d.role;
+    authToken = d.token;
     sessionStorage.setItem("waa_role", d.role);
+    sessionStorage.setItem("waa_token", d.token);
     showApp();
   })
   .catch(e => {
@@ -520,7 +538,9 @@ function submitLogin() {
 
 function logout() {
   sessionStorage.removeItem("waa_role");
-  userRole = null;
+  sessionStorage.removeItem("waa_token");
+  userRole  = null;
+  authToken = null;
   allRecords = [];
   document.getElementById("app").style.display          = "none";
   document.getElementById("login-screen").style.display = "flex";
@@ -547,8 +567,10 @@ function showApp() {
 // Session restore
 (function() {
   const saved = sessionStorage.getItem("waa_role");
-  if (saved === "admin" || saved === "readonly") {
-    userRole = saved;
+  const token = sessionStorage.getItem("waa_token");
+  if ((saved === "admin" || saved === "readonly") && token) {
+    userRole  = saved;
+    authToken = token;
     showApp();
   } else {
     document.getElementById("login-screen").style.display = "flex";
@@ -572,8 +594,7 @@ function showPage(p) {
 // ══════════════════════════════════════════════════════════════════════
 function loadCadets() {
   setStatus("Loading…");
-  fetch(API + "?action=list")
-    .then(r => r.json())
+  apiFetch("?action=list")
     .then(d => {
       allRecords = d.cadets || [];
       renderAll();
@@ -587,8 +608,7 @@ function refreshData() {
   const btn = document.getElementById("refreshBtn");
   btn.innerHTML = '<span class="spinner"></span> Refreshing…';
   btn.disabled = true;
-  fetch(API + "?action=refresh", { method: "POST" })
-    .then(r => r.json())
+  apiFetch("?action=refresh", { method: "POST" })
     .then(d => {
       allRecords = d.cadets || [];
       renderAll();
@@ -995,11 +1015,10 @@ function submitAdd() {
   btn.innerHTML = '<span class="spinner"></span> Saving…';
   btn.disabled = true;
   err.textContent = "";
-  fetch(API + "?action=add", {
+  apiFetch("?action=add", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, url, goal: parseInt(goal), manualSold: sold === "" ? 0 : parseInt(sold) })
   })
-  .then(r => r.json())
   .then(d => {
     if (d.error) throw new Error(d.error);
     allRecords.push(d.cadet);
@@ -1042,7 +1061,7 @@ function submitEdit() {
   btn.innerHTML = '<span class="spinner"></span> Saving…';
   btn.disabled = true;
   err.textContent = "";
-  fetch(API + "?action=edit&id=" + id, {
+  apiFetch("?action=edit&id=" + encodeURIComponent(id), {
     method: "PUT", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name, goal: parseInt(goal),
@@ -1050,7 +1069,6 @@ function submitEdit() {
       duplicates: duplicates === "" ? undefined : parseInt(duplicates)
     })
   })
-  .then(r => r.json())
   .then(d => {
     if (d.error) throw new Error(d.error);
     const idx = allRecords.findIndex(c => c.id === id);
@@ -1069,8 +1087,7 @@ function submitEdit() {
 function deleteCadet(id, name) {
   if (userRole !== "admin") return;
   if (!confirm("Remove " + name + " from the tracker?")) return;
-  fetch(API + "?action=delete&id=" + id, { method: "DELETE" })
-    .then(r => r.json())
+  apiFetch("?action=delete&id=" + encodeURIComponent(id), { method: "DELETE" })
     .then(d => {
       if (d.error) throw new Error(d.error);
       allRecords = allRecords.filter(c => c.id !== id);
