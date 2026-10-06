@@ -9,11 +9,11 @@ Live site: https://cadets-wreath-data.vercel.app
 ## Features
 - Password sign-in with two roles: **Admin** (full control) and **Read Only** (view only)
 - Squadron banner showing the official WAA squadron total vs. squadron goal
-- Cadet table showing wreaths sold, personal goal, and % progress, with sorting and top-seller medals
+- Cadet table showing wreaths sponsored, personal goal, and % progress, with sorting and top-cadet medals
 - Live scraping of each cadet's WAA profile page
 - Upstash Redis storage (no repeated scrapes on every page load)
-- Analytics page: squadron goal coverage, squadron status, top sellers, share of squadron
-  total, sold vs. goal, and wreaths still needed per cadet
+- Analytics page: squadron goal coverage, squadron status, top cadets, share of squadron
+  total, sponsored vs. goal, and wreaths still needed per cadet
 - Add / Edit / Remove cadets and one-click Refresh (admin only)
 
 ## Setup
@@ -56,7 +56,7 @@ cd Cadets_Wreath_Data
 - Click "Add Cadet"
 - Enter the cadet's name, their WAA profile URL
   (e.g. https://wreathsacrossamerica.org/pages/190619/Overview), and their personal wreath goal
-- Optionally enter wreaths sold, used only if the automatic fetch fails
+- Optionally enter wreaths sponsored, used only if the automatic fetch fails
 - The app scrapes and saves the count automatically
 
 ## Security
@@ -80,10 +80,10 @@ cd Cadets_Wreath_Data
 ## Notes
 - Data is saved in Redis. Click "Refresh Live Data" to re-scrape every WAA page.
 - Personal goals are entered by the admin, not pulled from WAA. Change them in the Edit modal.
-- If a scrape fails or returns 0, the last known count is kept. Use "Wreaths Sold
+- If a scrape fails or returns 0, the last known count is kept. Use "Wreaths Sponsored
   (manual override)" in the Edit modal to set it by hand.
 - The "Wreaths Still Needed" chart color-codes bars: green = goal met, red = still in progress.
 - **Matched wreaths**: during a WAA matching period, a cadet's live page can double-count
-  sales (10 sold shows as 20 sponsored). Open the cadet's Edit modal and enter the number to
+  sponsorships (10 sponsored shows as 20). Open the cadet's Edit modal and enter the number to
   subtract in "Matched Wreaths to Subtract". That number is re-applied automatically every
   time the count refreshes, so it stays correct until you reset it to 0.

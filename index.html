@@ -274,7 +274,7 @@
         <div class="squad-stats-row">
           <div class="squad-stat">
             <div class="squad-stat-val" id="squad-sold-val">—</div>
-            <div class="squad-stat-lbl accent">Total Sold (WAA Squadron Page)</div>
+            <div class="squad-stat-lbl accent">Total Sponsored (WAA Squadron Page)</div>
           </div>
           <div class="squad-stat">
             <div class="squad-stat-val" id="squad-goal-val">—</div>
@@ -301,7 +301,7 @@
     <div class="cadets-header-label">👤 Cadet Breakdown</div>
     <div class="cadet-kpis">
       <div class="kpi-card"><div class="kpi-icon blue">👤</div><div><div class="kpi-val" id="kpi-cadets">—</div><div class="kpi-lbl">Cadets Tracking</div></div></div>
-      <div class="kpi-card"><div class="kpi-icon green">🎗️</div><div><div class="kpi-val" id="kpi-sold">—</div><div class="kpi-lbl">Wreaths Sold (Cadets)</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon green">🎗️</div><div><div class="kpi-val" id="kpi-sold">—</div><div class="kpi-lbl">Wreaths Sponsored (Cadets)</div></div></div>
       <div class="kpi-card"><div class="kpi-icon gold">🎯</div><div><div class="kpi-val" id="kpi-goal">—</div><div class="kpi-lbl">Combined Cadet Goal</div></div></div>
       <div class="kpi-card"><div class="kpi-icon purple">📈</div><div><div class="kpi-val" id="kpi-pct">—</div><div class="kpi-lbl">Cadet Avg Progress</div></div></div>
     </div>
@@ -316,7 +316,7 @@
         <label for="sortSelect" style="font-size:.78rem;color:var(--muted);font-weight:600">Sort:</label>
         <select id="sortSelect" onchange="renderTable()" style="padding:6px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:.82rem;outline:none;cursor:pointer;background:white;color:var(--text)">
           <option value="rank">% of Goal (Best First)</option>
-          <option value="sold">Wreaths Sold</option>
+          <option value="sold">Wreaths Sponsored</option>
           <option value="name">Name (A–Z)</option>
           <option value="goal">Personal Goal</option>
         </select>
@@ -328,7 +328,7 @@
           <tr>
             <th>#</th>
             <th>Cadet</th>
-            <th>Wreaths Sold</th>
+            <th>Wreaths Sponsored</th>
             <th>Personal Goal</th>
             <th>Progress</th>
             <th>Status</th>
@@ -349,14 +349,14 @@
     <div class="charts-grid-2">
       <div class="chart-card">
         <h3>🎗️ Squadron Goal Coverage</h3>
-        <p class="chart-sub">Total wreaths sold vs. squadron goal</p>
+        <p class="chart-sub">Total wreaths sponsored vs. squadron goal</p>
         <canvas id="doughnutChart" height="220"></canvas>
       </div>
       <div class="chart-card">
         <h3>📋 Squadron Status</h3>
         <p class="chart-sub">Where things stand right now, at a glance</p>
         <div class="cadet-kpis status-kpis">
-          <div class="kpi-card"><div class="kpi-icon blue">👥</div><div><div class="kpi-val" id="kpi-participation">—</div><div class="kpi-lbl">Actively Selling</div></div></div>
+          <div class="kpi-card"><div class="kpi-icon blue">👥</div><div><div class="kpi-val" id="kpi-participation">—</div><div class="kpi-lbl">Cadets With Sponsorships</div></div></div>
           <div class="kpi-card"><div class="kpi-icon green">🎯</div><div><div class="kpi-val" id="kpi-atgoal">—</div><div class="kpi-lbl">Cadets At Goal</div></div></div>
           <div class="kpi-card"><div class="kpi-icon gold">📦</div><div><div class="kpi-val" id="kpi-avgsold">—</div><div class="kpi-lbl">Avg Wreaths / Cadet</div></div></div>
           <div class="kpi-card"><div class="kpi-icon purple">⚠️</div><div><div class="kpi-val" id="kpi-needpush">—</div><div class="kpi-lbl">Need a Push (&lt;50%)</div></div></div>
@@ -372,13 +372,13 @@
     <div class="analytics-section-label">🏆 Cadet Leadership — Wreaths Sponsored</div>
     <div class="charts-grid-2">
       <div class="chart-card">
-        <h3>🏆 Top Sellers</h3>
+        <h3>🏆 Top Cadets</h3>
         <p class="chart-sub">Ranked by total wreaths sponsored</p>
         <ul class="leaderboard" id="leaderboard"></ul>
       </div>
       <div class="chart-card">
         <h3>📊 Share of Squadron Total</h3>
-        <p class="chart-sub" id="shareChartSub">Each cadet's slice of everything sold</p>
+        <p class="chart-sub" id="shareChartSub">Each cadet's slice of everything sponsored</p>
         <canvas id="shareChart" height="220"></canvas>
       </div>
     </div>
@@ -386,8 +386,8 @@
     <!-- Per-cadet breakdown -->
     <div class="analytics-section-label">👤 Cadet Detail</div>
     <div class="chart-card chart-full">
-      <h3>📊 Wreaths Sold vs. Personal Goal — Ranked by Total Sold</h3>
-      <p class="chart-sub">Top sellers first · green = goal met, red = still in progress</p>
+      <h3>📊 Wreaths Sponsored vs. Personal Goal — Ranked by Total Sponsored</h3>
+      <p class="chart-sub">Top cadets first · green = goal met, red = still in progress</p>
       <canvas id="barChart" height="110"></canvas>
     </div>
 
@@ -418,7 +418,7 @@
       <input id="add-goal" type="number" placeholder="e.g. 50" min="1"/>
     </div>
     <div class="fgroup">
-      <label for="add-sold">Wreaths Sold (fallback if auto-fetch fails)</label>
+      <label for="add-sold">Wreaths Sponsored (fallback if auto-fetch fails)</label>
       <input id="add-sold" type="number" placeholder="e.g. 12" min="0"/>
       <div class="fhint">Leave at 0 — the system will pull the live count from WAA automatically. Only set this if the auto-fetch doesn't work.</div>
     </div>
@@ -444,14 +444,14 @@
       <input id="edit-goal" type="number" min="0"/>
     </div>
     <div class="fgroup">
-      <label for="edit-sold">Wreaths Sold (manual override)</label>
+      <label for="edit-sold">Wreaths Sponsored (manual override)</label>
       <input id="edit-sold" type="number" min="0"/>
       <div class="fhint">Use only if the auto-pull from WAA is incorrect. Click "Refresh Live Data" in the header to re-fetch from WAA.</div>
     </div>
     <div class="fgroup">
       <label for="edit-duplicates">Matched Wreaths to Subtract</label>
       <input id="edit-duplicates" type="number" min="0" placeholder="e.g. 10"/>
-      <div class="fhint">During a WAA matching period the live count can double what a cadet actually sold (10 sold can show as 20). Enter how many to subtract — it's applied automatically every time the count refreshes, and stays in effect until you change it back to 0.</div>
+      <div class="fhint">During a WAA matching period the live count can double a cadet's actual sponsorships (10 sponsored can show as 20). Enter how many to subtract — it's applied automatically every time the count refreshes, and stays in effect until you change it back to 0.</div>
     </div>
     <div class="modal-err" id="editErr"></div>
     <div class="modal-foot">
@@ -646,7 +646,7 @@ function renderSquadronBanner() {
   document.getElementById("squad-pct-badge").textContent   = pct + "%";
   document.getElementById("squad-fill").style.width        = fill + "%";
   document.getElementById("squad-sub-left").textContent    = sq
-    ? "Live total from the WAA Squadron page — includes cadet sales + any other donations"
+    ? "Live total from the WAA Squadron page — includes cadet sponsorships + any other donations"
     : "⚠️ No Squadron entry found — add a record named 'Squadron' with the WAA squadron URL to track the official total";
   document.getElementById("squad-sub-right").textContent   = needed > 0
     ? needed.toLocaleString() + " wreaths to go"
@@ -800,7 +800,7 @@ function renderCharts() {
           borderRadius: 5
         },
         {
-          label: "Wreaths Sold",
+          label: "Wreaths Sponsored",
           data: sold,
           backgroundColor: sold.map((s,i) => s >= goals[i] ? "rgba(46,125,50,0.75)" : "rgba(198,40,40,0.65)"),
           borderColor:     sold.map((s,i) => s >= goals[i] ? "rgba(46,125,50,1)"    : "rgba(198,40,40,1)"),
@@ -842,7 +842,7 @@ function renderCharts() {
   chartDoughnut = new Chart(document.getElementById("doughnutChart").getContext("2d"), {
     type: "doughnut",
     data: {
-      labels: ["Wreaths Sold", sqGoal > 0 ? "Still Needed" : ""],
+      labels: ["Wreaths Sponsored", sqGoal > 0 ? "Still Needed" : ""],
       datasets: [{
         data: doughnutData,
         backgroundColor: ["#43a047", "#e0e7ef"],
@@ -931,8 +931,8 @@ function renderCharts() {
   const shareSub = document.getElementById("shareChartSub");
   if (shareSub) {
     shareSub.textContent = totalSoldForShare > 0
-      ? `Top 3 sellers account for ${Math.round(top3Share)}% of everything the squadron has sold`
-      : "Each cadet's slice of everything sold";
+      ? `Top 3 cadets account for ${Math.round(top3Share)}% of everything the squadron has sponsored`
+      : "Each cadet's slice of everything sponsored";
   }
   chartShare = new Chart(document.getElementById("shareChart").getContext("2d"), {
     type: "bar",
