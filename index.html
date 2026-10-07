@@ -92,6 +92,7 @@
 
     /* ── CADET KPI CARDS ── */
     .cadet-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    .cadet-kpis.with-earn { grid-template-columns:repeat(5,1fr); }
     .kpi-card { background:var(--card); border-radius:12px; border:1px solid var(--border); padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.06); display:flex; align-items:center; gap:14px; }
     .kpi-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
     .kpi-icon.blue   { background:#e3f2fd; }
@@ -126,6 +127,7 @@
     .td-link:hover { text-decoration:underline; }
     .td-num  { font-size:1rem; font-weight:700; color:var(--blue); }
     .td-goal { font-size:1rem; font-weight:700; color:var(--muted); }
+    .td-earn { font-size:1rem; font-weight:700; color:#15803d; }
     .bar-wrap  { display:flex; align-items:center; gap:10px; min-width:160px; }
     .bar-track { flex:1; height:8px; background:#e0e7ef; border-radius:99px; overflow:hidden; }
     .bar-fill  { height:100%; border-radius:99px; transition:width .5s ease; }
@@ -197,7 +199,8 @@
 
     @media (max-width:960px) {
       .squad-stats-row { grid-template-columns:1fr 1fr; }
-      .cadet-kpis { grid-template-columns:1fr 1fr; }
+      .cadet-kpis,.cadet-kpis.with-earn { grid-template-columns:1fr 1fr; }
+      .cadet-kpis.with-earn .earn-card { grid-column:span 2; }
       .charts-grid-2,.charts-grid-3 { grid-template-columns:1fr; }
     }
     @media (max-width:640px) {
@@ -205,7 +208,7 @@
       #page-dashboard,#page-analytics { padding:16px; }
       .squad-banner { padding:18px 16px; }
       .squad-stats-row { grid-template-columns:1fr 1fr; gap:10px; }
-      .cadet-kpis { grid-template-columns:1fr 1fr; gap:10px; }
+      .cadet-kpis,.cadet-kpis.with-earn { grid-template-columns:1fr 1fr; gap:10px; }
       table { font-size:.8rem; }
       td,thead th { padding:10px 12px; }
     }
@@ -299,11 +302,12 @@
 
     <!-- ── CADET KPI CARDS ── -->
     <div class="cadets-header-label">👤 Cadet Breakdown</div>
-    <div class="cadet-kpis">
+    <div class="cadet-kpis" id="cadetKpis">
       <div class="kpi-card"><div class="kpi-icon blue">👤</div><div><div class="kpi-val" id="kpi-cadets">—</div><div class="kpi-lbl">Cadets Tracking</div></div></div>
       <div class="kpi-card"><div class="kpi-icon green">🎗️</div><div><div class="kpi-val" id="kpi-sold">—</div><div class="kpi-lbl">Wreaths Sponsored (Cadets)</div></div></div>
       <div class="kpi-card"><div class="kpi-icon gold">🎯</div><div><div class="kpi-val" id="kpi-goal">—</div><div class="kpi-lbl">Combined Cadet Goal</div></div></div>
       <div class="kpi-card"><div class="kpi-icon purple">📈</div><div><div class="kpi-val" id="kpi-pct">—</div><div class="kpi-lbl">Cadet Avg Progress</div></div></div>
+      <div class="kpi-card earn-card admin-only"><div class="kpi-icon green">💵</div><div><div class="kpi-val" id="kpi-earned">—</div><div class="kpi-lbl">Total Earned This Year</div></div></div>
     </div>
 
     <!-- ── CADET TABLE ── -->
@@ -329,6 +333,7 @@
             <th>#</th>
             <th>Cadet</th>
             <th>Wreaths Sponsored</th>
+            <th class="admin-only" title="$5 per sponsored wreath, matched wreaths excluded">Earned This Year</th>
             <th>Personal Goal</th>
             <th>Progress</th>
             <th>Status</th>
@@ -468,6 +473,8 @@
 const API = "/api/proxy";
 let allRecords = [];   // everything from Redis (cadets + squadron entry)
 let userRole   = null;
+const EARN_PER_WREATH = 5;  // dollars a cadet earns per sponsored (non-matched) wreath
+function fmtMoney(n) { return "$" + n.toLocaleString("en-US"); }
 let authToken  = null; // signed session token from the server
 
 // Chart instances — kept so we can destroy before redraw
@@ -561,6 +568,7 @@ function showApp() {
   });
   const ah = document.getElementById("actions-header");
   if (ah) ah.style.display = userRole === "admin" ? "" : "none";
+  document.getElementById("cadetKpis").classList.toggle("with-earn", userRole === "admin");
   loadCadets();
 }
 
@@ -662,6 +670,7 @@ function renderCadetKPIs() {
   document.getElementById("kpi-sold").textContent   = totalSold.toLocaleString();
   document.getElementById("kpi-goal").textContent   = totalGoal.toLocaleString();
   document.getElementById("kpi-pct").textContent    = pct + "%";
+  document.getElementById("kpi-earned").textContent = fmtMoney(totalSold * EARN_PER_WREATH);
 }
 
 function getSortedCadets() {
@@ -689,7 +698,7 @@ function renderTable() {
   const isAdmin = userRole === "admin";
   const sorted  = getSortedCadets();
   const medals  = getMedals();
-  const cols    = isAdmin ? 8 : 7;
+  const cols    = isAdmin ? 9 : 7;
 
   if (!sorted.length) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="${cols}">No cadets yet${isAdmin?' — click <strong>Add Cadet</strong> to get started':''}.  </td></tr>`;
@@ -713,6 +722,10 @@ function renderTable() {
     const dupNote = c.duplicates > 0
       ? `<br><span class="dup-note" title="Raw WAA count: ${c.rawSold ?? (sold + c.duplicates)} minus ${c.duplicates} matched wreath${c.duplicates===1?'':'s'}">−${c.duplicates} match</span>`
       : "";
+    // Cadets earn per sponsored wreath; `sold` already has matched wreaths subtracted.
+    const earnCell = isAdmin
+      ? `<td><span class="td-earn">${fmtMoney(sold * EARN_PER_WREATH)}</span></td>`
+      : "";
     const actCell = isAdmin
       ? `<td><div class="td-actions"><button class="act-btn act-edit" onclick="openEditModal('${escHtml(c.id)}')">✏️ Edit</button><button class="act-btn act-del" onclick="deleteCadet('${escHtml(c.id)}','${escHtml(c.name).replace(/'/g,"&#39;")}')">✕</button></div></td>`
       : "";
@@ -720,6 +733,7 @@ function renderTable() {
       <td style="color:var(--muted);font-weight:700">${i+1}</td>
       <td class="td-name">${medal}${escHtml(c.name)}<a class="td-link" href="${safeUrl(c.url)}" target="_blank" rel="noopener noreferrer">WAA Page ↗</a></td>
       <td><span class="td-num">${sold}</span> ${scrapeNote}${dupNote}</td>
+      ${earnCell}
       <td><span class="td-goal">${goal}</span></td>
       <td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div><span class="bar-pct">${pct}%</span></div></td>
       <td>${badge}</td>
